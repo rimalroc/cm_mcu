@@ -53,7 +53,9 @@ include ${ROOT}/makedefs
 IPATH=..
 
 # definitions of the part
-PART=TM4C1290NCPDT
+PART?=TM4C1290NCPDT
+#PART?=TM4C129ENCPDT
+$(info compiling for PART = $(PART))
 
 CFLAGS+=-DTARGET_IS_TM4C129_RA2
 

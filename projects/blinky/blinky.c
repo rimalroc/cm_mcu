@@ -30,7 +30,7 @@
 #include "driverlib/sysctl.h"
 #include "driverlib/rom.h"
 #include "driverlib/rom_map.h"
-
+// a comment
 //*****************************************************************************
 //
 //! \addtogroup example_list
@@ -68,22 +68,22 @@ main(void)
   // Enable the GPIO ports that are used for the on-board LED.
   // Two are J; one is P
   //
-  MAP_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOJ);
+  MAP_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPION);
 
   //
   // Check if the peripheral access is enabled.
   //
-  while(!MAP_SysCtlPeripheralReady(SYSCTL_PERIPH_GPIOJ)) {
+  while(!MAP_SysCtlPeripheralReady(SYSCTL_PERIPH_GPION)) {
   }
 
   // Enable the GPIO port that is used for the on-board LED.
   //
-  MAP_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOP);
+  MAP_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOF);
 
   //
   // Check if the peripheral access is enabled.
   //
-  while(!MAP_SysCtlPeripheralReady(SYSCTL_PERIPH_GPIOP)) {
+  while(!MAP_SysCtlPeripheralReady(SYSCTL_PERIPH_GPIOF)) {
   }
 
 
@@ -96,18 +96,18 @@ main(void)
   // Configure the GPIO Pin Mux for PJ0
   // for GPIO_PJ0
   //
-  MAP_GPIOPinTypeGPIOOutput(GPIO_PORTJ_BASE, GPIO_PIN_0);
+  MAP_GPIOPinTypeGPIOOutput(GPIO_PORTN_BASE, GPIO_PIN_0);
     
   //
   // Configure the GPIO Pin Mux for PJ1
   // for GPIO_PJ1
   //
-  MAP_GPIOPinTypeGPIOOutput(GPIO_PORTJ_BASE, GPIO_PIN_1);
+  MAP_GPIOPinTypeGPIOOutput(GPIO_PORTN_BASE, GPIO_PIN_1);
   //
   // Configure the GPIO Pin Mux for PP0
   // for GPIO_PP0
   //
-  MAP_GPIOPinTypeGPIOOutput(GPIO_PORTP_BASE, GPIO_PIN_0);
+  MAP_GPIOPinTypeGPIOOutput(GPIO_PORTF_AHB_BASE, GPIO_PIN_0);
 
 
   // original code: to be deleted
@@ -121,7 +121,7 @@ main(void)
     // Turn on the LEDs -- RED
     
     // 
-    MAP_GPIOPinWrite(GPIO_PORTP_BASE, GPIO_PIN_0, GPIO_PIN_0);
+    MAP_GPIOPinWrite(GPIO_PORTN_BASE, GPIO_PIN_0, GPIO_PIN_0);
 
     //
     // Delay for a bit.
@@ -132,7 +132,7 @@ main(void)
     //
     // Turn off the LED.
     //
-    MAP_GPIOPinWrite(GPIO_PORTP_BASE, GPIO_PIN_0, 0x0);
+    MAP_GPIOPinWrite(GPIO_PORTN_BASE, GPIO_PIN_0, 0x0);
 
 
     //
@@ -143,7 +143,7 @@ main(void)
     // Turn on the LEDs -- GREEN
     
     // 
-    MAP_GPIOPinWrite(GPIO_PORTJ_BASE, GPIO_PIN_1, GPIO_PIN_1);
+    MAP_GPIOPinWrite(GPIO_PORTN_BASE, GPIO_PIN_1, GPIO_PIN_1);
 
     //
     // Delay for a bit.
@@ -154,7 +154,7 @@ main(void)
     //
     // Turn off the LED.
     //
-    MAP_GPIOPinWrite(GPIO_PORTJ_BASE, GPIO_PIN_1, 0x0);
+    MAP_GPIOPinWrite(GPIO_PORTN_BASE, GPIO_PIN_1, 0x0);
 
 
     //
@@ -165,7 +165,7 @@ main(void)
     // Turn on the LEDs -- BLUE
     
     // 
-    MAP_GPIOPinWrite(GPIO_PORTJ_BASE, GPIO_PIN_0, GPIO_PIN_0);
+    MAP_GPIOPinWrite(GPIO_PORTF_AHB_BASE, GPIO_PIN_0, GPIO_PIN_0);
 
     //
     // Delay for a bit.
@@ -176,7 +176,7 @@ main(void)
     //
     // Turn off the LED.
     //
-    MAP_GPIOPinWrite(GPIO_PORTJ_BASE, GPIO_PIN_0, 0x0);
+    MAP_GPIOPinWrite(GPIO_PORTF_AHB_BASE, GPIO_PIN_0, 0x0);
 
 
     //

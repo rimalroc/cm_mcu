@@ -41,14 +41,25 @@
 #define UARTx_BASE           UART0_BASE
 #define LED_PERIPH           SYSCTL_PERIPH_GPIOP
 #define LED_BASE             GPIO_PORTP_BASE
-#define LED_PIN              GPIO_PIN_3
+#define LED_PIN_0              GPIO_PIN_3
 #else
+#ifdef PART_TM4C1290NCPDT 
 #define LED_PERIPH SYSCTL_PERIPH_GPIOJ
 #define LED_BASE GPIO_PORTJ_BASE
-#define LED_PIN GPIO_PIN_1
+#define LED_PIN_0 GPIO_PIN_1
 
 #define UART_FRONTPANEL      UART4_BASE
 #define UARTx_BASE           UART4_BASE
+#else
+#warning "this is the way"
+#define LED_PERIPH SYSCTL_PERIPH_GPION
+#define LED_BASE GPIO_PORTN_BASE
+#define LED_PIN_0 GPIO_PIN_0
+#define LED_PIN_1 GPIO_PIN_1
+
+#define UART_FRONTPANEL      UART0_BASE
+#define UARTx_BASE           UART0_BASE
+#endif
 #endif
 
 //*****************************************************************************
@@ -115,7 +126,7 @@ UARTIntHandler(void)
       //
       // Blink the LED to show a character transfer is occurring.
       //
-      ROM_GPIOPinWrite(LED_BASE, LED_PIN, LED_PIN);
+      ROM_GPIOPinWrite(LED_BASE, LED_PIN_0, LED_PIN_0);
 
       //
       // Delay for 1 millisecond.  Each SysCtlDelay is about 3 clocks.
@@ -125,7 +136,7 @@ UARTIntHandler(void)
       //
       // Turn off the LED
       //
-      ROM_GPIOPinWrite(LED_BASE, LED_PIN, 0x0);
+      ROM_GPIOPinWrite(LED_BASE, LED_PIN_0, 0x0);
       
     }
 }
@@ -158,6 +169,7 @@ UARTSend(const uint8_t *pui8Buffer, uint32_t ui32Count)
 int
 main(void)
 {
+  volatile uint32_t ui32Loop;
   //
   // Set the clocking to run directly from the crystal at 120MHz.
   //
@@ -167,12 +179,16 @@ main(void)
   // Enable the GPIO port that is used for the on-board LED.
   //
   ROM_SysCtlPeripheralEnable(LED_PERIPH);
-
   //
-  // Enable the GPIO pins for the LED (PJ1).
+  // Check if the peripheral access is enabled.
   //
-  ROM_GPIOPinTypeGPIOOutput(LED_BASE, LED_PIN);
-
+  while(!MAP_SysCtlPeripheralReady(SYSCTL_PERIPH_GPION)) {
+  }
+  //
+  // Enable the GPIO pins for the LEDs.
+  //
+  ROM_GPIOPinTypeGPIOOutput(LED_BASE, LED_PIN_0);
+  ROM_GPIOPinTypeGPIOOutput(LED_BASE, LED_PIN_1);
   //
   // Enable the peripherals used by this example.
   //
@@ -265,40 +281,20 @@ main(void)
   //
   ROM_IntMasterEnable();
 
-#ifdef REV1
-  //
-  // Set relevant GPIO pins as UART pins.
-  //
-  //
-  // Configure the GPIO Pin Mux for PA2
-  // for U4RX
-  //
-  ROM_GPIOPinConfigure(GPIO_PA2_U4RX);
-  ROM_GPIOPinTypeUART(GPIO_PORTA_BASE, GPIO_PIN_2);
-
-  //
-  // Configure the GPIO Pin Mux for PA3
-  // for U4TX
-  //
-  ROM_GPIOPinConfigure(GPIO_PA3_U4TX);
-  ROM_GPIOPinTypeUART(GPIO_PORTA_BASE, GPIO_PIN_3);
-
-  //
-  // Configure the UART for 115,200, 8-N-1 operation.
-  //
-  ROM_UARTConfigSetExpClk(UART_FRONTPANEL, g_ui32SysClock, 115200,
-                          (UART_CONFIG_WLEN_8 | UART_CONFIG_STOP_ONE | UART_CONFIG_PAR_NONE));
+#if UARTx_BASE == UART4_BASE
   //
   // Enable the UART interrupt.
   //
   ROM_IntEnable(INT_UART4);
   ROM_UARTIntEnable(UART_FRONTPANEL, UART_INT_RX | UART_INT_RT);
-#else // REV2
+#elif UARTx_BASE == UART0_BASE
   //
   // Enable the UART interrupt.
   //
   ROM_IntEnable(INT_UART0);
   ROM_UARTIntEnable(UART0_BASE, UART_INT_RX | UART_INT_RT);
+#else
+#error "Not supported UART"
 #endif
   //
   // Prompt for text to be entered.
@@ -308,7 +304,24 @@ main(void)
   //
   // Loop forever echoing data through the UART.
   //
-  while(1)
-    {
+  while(1){
+    // Turn on the LEDs -- RED
+    // 
+    MAP_GPIOPinWrite(LED_BASE, LED_PIN_1, LED_PIN_1);
+
+    //
+    // Delay for a bit.
+    //
+    for(ui32Loop = 0; ui32Loop < 200000; ui32Loop++) {
     }
+
+    //
+    // Turn off the LED.
+    //
+    MAP_GPIOPinWrite(LED_BASE, LED_PIN_1, 0x0);
+
+    for(ui32Loop = 0; ui32Loop < 200000; ui32Loop++) {
+    }
+
+  }
 }
