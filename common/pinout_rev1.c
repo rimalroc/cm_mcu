@@ -66,9 +66,11 @@
 //! \return None.
 //
 //*****************************************************************************
+
 void
 PinoutSet(void)
 {
+    #ifdef PART_TM4C1290NCPDT
     //
     // Enable Peripheral Clocks 
     //
@@ -678,6 +680,28 @@ PinoutSet(void)
 	MAP_GPIOPinConfigure(GPIO_PA3_U4TX);
 	MAP_GPIOPinTypeUART(GPIO_PORTA_BASE, GPIO_PIN_3);
 
+#else
+#ifdef PART_TM4C129ENCPDT 
+#warning "using alternative pins definition"
+
+    //
+    // Enable the GPIO port that is used for the on-board LED.
+    //
+    ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPION);
+
+    //
+    // Enable the GPIO pins for the LED (PN0).
+    //
+    ROM_GPIOPinTypeGPIOOutput(GPIO_PORTN_BASE, GPIO_PIN_0);
+
+    //
+    // Enable the peripherals used by this example.
+    //
+    ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_UART0);
+    ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
+
+#endif
+#endif
 }
 
 //*****************************************************************************

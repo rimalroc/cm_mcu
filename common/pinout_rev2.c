@@ -69,6 +69,7 @@
 void
 PinoutSet(void)
 {
+#ifdef PART_TM4C1290NCPDT
     //
     // Enable Peripheral Clocks 
     //
@@ -642,6 +643,10 @@ PinoutSet(void)
 	MAP_GPIOPinConfigure(GPIO_PA3_U4TX);
 	MAP_GPIOPinTypeUART(GPIO_PORTA_BASE, GPIO_PIN_3);
 
+#else
+#warning "no pins defined for this board"
+
+#endif
 }
 
 //*****************************************************************************

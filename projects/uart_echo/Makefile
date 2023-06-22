@@ -25,7 +25,8 @@
 #
 # Defines the part type that this project uses.
 #
-PART=TM4C1290NCPDT
+PART?=TM4C1290NCPDT
+$(info compiling uart_echo for PART = $(PART))
 
 #
 # The base directory for TivaWare.
