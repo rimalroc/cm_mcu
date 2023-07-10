@@ -54,6 +54,41 @@ __error__(char *pcFilename, uint32_t ui32Line)
 }
 #endif
 
+#ifdef REV2
+#define UART_FRONTPANEL      UART0_BASE
+#define UARTx_BASE           UART0_BASE
+#define LED_PERIPH           SYSCTL_PERIPH_GPIOP
+#define LED_BASE             GPIO_PORTP_BASE
+#define LED_PIN_0              GPIO_PIN_3
+#else
+#ifdef PART_TM4C1290NCPDT 
+#warning "PART_TM4C1290NCPDT"
+#define LED_PERIPH_0 SYSCTL_PERIPH_GPIOJ
+#define LED_PERIPH_1 SYSCTL_PERIPH_GPIOP
+#define LED_BASE_0 GPIO_PORTJ_BASE
+#define LED_BASE_1 GPIO_PORTP_BASE
+#define LED_PIN_0 GPIO_PIN_0
+#define LED_PIN_1 GPIO_PIN_1
+#define LED_PIN_2 GPIO_PIN_0
+
+#define UART_FRONTPANEL      UART4_BASE
+#define UARTx_BASE           UART4_BASE
+#elif defined(PART_TM4C1294NCPDT ) || defined(PART_TM4C129ENCPDT)
+#warning "PART_TM4C1294NCPDT or TM4C129ENCPDT"
+#define LED_PERIPH_0 SYSCTL_PERIPH_GPION
+#define LED_PERIPH_1 SYSCTL_PERIPH_GPIOF
+#define LED_BASE_0 GPIO_PORTN_BASE
+#define LED_BASE_1 GPIO_PORTF_AHB_BASE
+#define LED_PIN_0 GPIO_PIN_0
+#define LED_PIN_1 GPIO_PIN_1
+#define LED_PIN_2 GPIO_PIN_0
+
+#define UART_FRONTPANEL      UART0_BASE
+#define UARTx_BASE           UART0_BASE
+#else
+#error PART needs to be specified.
+#endif
+#endif
 //*****************************************************************************
 //
 // Blink the on-board LEDs
@@ -68,22 +103,22 @@ main(void)
   // Enable the GPIO ports that are used for the on-board LED.
   // Two are J; one is P
   //
-  MAP_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPION);
+  MAP_SysCtlPeripheralEnable(LED_PERIPH_0);
 
   //
   // Check if the peripheral access is enabled.
   //
-  while(!MAP_SysCtlPeripheralReady(SYSCTL_PERIPH_GPION)) {
+  while(!MAP_SysCtlPeripheralReady(LED_PERIPH_0)) {
   }
 
   // Enable the GPIO port that is used for the on-board LED.
   //
-  MAP_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOF);
+  MAP_SysCtlPeripheralEnable(LED_PERIPH_1);
 
   //
   // Check if the peripheral access is enabled.
   //
-  while(!MAP_SysCtlPeripheralReady(SYSCTL_PERIPH_GPIOF)) {
+  while(!MAP_SysCtlPeripheralReady(LED_PERIPH_1)) {
   }
 
 
@@ -96,18 +131,18 @@ main(void)
   // Configure the GPIO Pin Mux for PJ0
   // for GPIO_PJ0
   //
-  MAP_GPIOPinTypeGPIOOutput(GPIO_PORTN_BASE, GPIO_PIN_0);
+  MAP_GPIOPinTypeGPIOOutput(LED_BASE_0, LED_PIN_0);
     
   //
   // Configure the GPIO Pin Mux for PJ1
   // for GPIO_PJ1
   //
-  MAP_GPIOPinTypeGPIOOutput(GPIO_PORTN_BASE, GPIO_PIN_1);
+  MAP_GPIOPinTypeGPIOOutput(LED_BASE_0, LED_PIN_1);
   //
   // Configure the GPIO Pin Mux for PP0
   // for GPIO_PP0
   //
-  MAP_GPIOPinTypeGPIOOutput(GPIO_PORTF_AHB_BASE, GPIO_PIN_0);
+  MAP_GPIOPinTypeGPIOOutput(LED_BASE_1, LED_PIN_2);
 
 
   // original code: to be deleted
@@ -121,7 +156,7 @@ main(void)
     // Turn on the LEDs -- RED
     
     // 
-    MAP_GPIOPinWrite(GPIO_PORTN_BASE, GPIO_PIN_0, GPIO_PIN_0);
+    MAP_GPIOPinWrite(LED_BASE_0, LED_PIN_0, LED_PIN_0);
 
     //
     // Delay for a bit.
@@ -132,7 +167,7 @@ main(void)
     //
     // Turn off the LED.
     //
-    MAP_GPIOPinWrite(GPIO_PORTN_BASE, GPIO_PIN_0, 0x0);
+    MAP_GPIOPinWrite(LED_BASE_0, LED_PIN_0, 0x0);
 
 
     //
@@ -143,7 +178,7 @@ main(void)
     // Turn on the LEDs -- GREEN
     
     // 
-    MAP_GPIOPinWrite(GPIO_PORTN_BASE, GPIO_PIN_1, GPIO_PIN_1);
+    MAP_GPIOPinWrite(LED_BASE_0, LED_PIN_1, LED_PIN_1);
 
     //
     // Delay for a bit.
@@ -154,7 +189,7 @@ main(void)
     //
     // Turn off the LED.
     //
-    MAP_GPIOPinWrite(GPIO_PORTN_BASE, GPIO_PIN_1, 0x0);
+    MAP_GPIOPinWrite(LED_BASE_0, LED_PIN_1, 0x0);
 
 
     //
@@ -165,7 +200,7 @@ main(void)
     // Turn on the LEDs -- BLUE
     
     // 
-    MAP_GPIOPinWrite(GPIO_PORTF_AHB_BASE, GPIO_PIN_0, GPIO_PIN_0);
+    MAP_GPIOPinWrite(LED_BASE_1, LED_PIN_2, LED_PIN_2);
 
     //
     // Delay for a bit.
@@ -176,7 +211,7 @@ main(void)
     //
     // Turn off the LED.
     //
-    MAP_GPIOPinWrite(GPIO_PORTF_AHB_BASE, GPIO_PIN_0, 0x0);
+    MAP_GPIOPinWrite(LED_BASE_1, LED_PIN_2, 0x0);
 
 
     //

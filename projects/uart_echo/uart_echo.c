@@ -44,21 +44,31 @@
 #define LED_PIN_0              GPIO_PIN_3
 #else
 #ifdef PART_TM4C1290NCPDT 
-#define LED_PERIPH SYSCTL_PERIPH_GPIOJ
-#define LED_BASE GPIO_PORTJ_BASE
-#define LED_PIN_0 GPIO_PIN_1
+#warning "PART_TM4C1290NCPDT"
+#define LED_PERIPH_0 SYSCTL_PERIPH_GPIOJ
+#define LED_PERIPH_1 SYSCTL_PERIPH_GPIOP
+#define LED_BASE_0 GPIO_PORTJ_BASE
+#define LED_BASE_1 GPIO_PORTP_BASE
+#define LED_PIN_0 GPIO_PIN_0
+#define LED_PIN_1 GPIO_PIN_1
+#define LED_PIN_2 GPIO_PIN_0
 
 #define UART_FRONTPANEL      UART4_BASE
 #define UARTx_BASE           UART4_BASE
-#else
-#warning "this is the way"
-#define LED_PERIPH SYSCTL_PERIPH_GPION
-#define LED_BASE GPIO_PORTN_BASE
+#elif defined(PART_TM4C1294NCPDT ) || defined(PART_TM4C129ENCPDT)
+#warning "PART_TM4C1294NCPDT or TM4C129ENCPDT"
+#define LED_PERIPH_0 SYSCTL_PERIPH_GPION
+#define LED_PERIPH_1 SYSCTL_PERIPH_GPIOF
+#define LED_BASE_0 GPIO_PORTN_BASE
+#define LED_BASE_1 GPIO_PORTF_AHB_BASE
 #define LED_PIN_0 GPIO_PIN_0
 #define LED_PIN_1 GPIO_PIN_1
+#define LED_PIN_2 GPIO_PIN_0
 
 #define UART_FRONTPANEL      UART0_BASE
 #define UARTx_BASE           UART0_BASE
+#else
+#error PART needs to be specified.
 #endif
 #endif
 
@@ -126,7 +136,7 @@ UARTIntHandler(void)
       //
       // Blink the LED to show a character transfer is occurring.
       //
-      ROM_GPIOPinWrite(LED_BASE, LED_PIN_0, LED_PIN_0);
+      ROM_GPIOPinWrite(LED_BASE_0, LED_PIN_0, LED_PIN_0);
 
       //
       // Delay for 1 millisecond.  Each SysCtlDelay is about 3 clocks.
@@ -136,7 +146,7 @@ UARTIntHandler(void)
       //
       // Turn off the LED
       //
-      ROM_GPIOPinWrite(LED_BASE, LED_PIN_0, 0x0);
+      ROM_GPIOPinWrite(LED_BASE_0, LED_PIN_0, 0x0);
       
     }
 }
@@ -178,7 +188,7 @@ main(void)
   //
   // Enable the GPIO port that is used for the on-board LED.
   //
-  ROM_SysCtlPeripheralEnable(LED_PERIPH);
+  ROM_SysCtlPeripheralEnable(LED_PERIPH_0);
   //
   // Check if the peripheral access is enabled.
   //
@@ -187,8 +197,8 @@ main(void)
   //
   // Enable the GPIO pins for the LEDs.
   //
-  ROM_GPIOPinTypeGPIOOutput(LED_BASE, LED_PIN_0);
-  ROM_GPIOPinTypeGPIOOutput(LED_BASE, LED_PIN_1);
+  ROM_GPIOPinTypeGPIOOutput(LED_BASE_0, LED_PIN_0);
+  ROM_GPIOPinTypeGPIOOutput(LED_BASE_0, LED_PIN_1);
   //
   // Enable the peripherals used by this example.
   //
@@ -307,7 +317,7 @@ main(void)
   while(1){
     // Turn on the LEDs -- RED
     // 
-    MAP_GPIOPinWrite(LED_BASE, LED_PIN_1, LED_PIN_1);
+    MAP_GPIOPinWrite(LED_BASE_0, LED_PIN_1, LED_PIN_1);
 
     //
     // Delay for a bit.
@@ -318,7 +328,7 @@ main(void)
     //
     // Turn off the LED.
     //
-    MAP_GPIOPinWrite(LED_BASE, LED_PIN_1, 0x0);
+    MAP_GPIOPinWrite(LED_BASE_0, LED_PIN_1, 0x0);
 
     for(ui32Loop = 0; ui32Loop < 200000; ui32Loop++) {
     }

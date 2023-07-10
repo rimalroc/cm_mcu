@@ -118,7 +118,7 @@ CFLAGS=-mthumb             \
 #       -ffile-prefix-map=${BASE}=. \
 
 #
-# The size command
+# The size command>
 #
 SIZE=${PREFIX}-size 
 

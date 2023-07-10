@@ -170,11 +170,17 @@ header file. */
 #define configASSERT(x) APOLLO_ASSERT((x))
 
 // non-standard, park this here for now
-#ifdef REV1
-#define FP_UART UART4_BASE // Front panel UART
-#define ZQ_UART UART1_BASE // Zynq-facing UART
+#ifdef DEVBOARD
+  #define FP_UART UART0_BASE // debug UART    
+  #define ZQ_UART UART1_BASE // Zynq-facing UART
+
+#elif REV1
+  #define FP_UART UART4_BASE // Front panel UART
+  #define ZQ_UART UART1_BASE // Zynq-facing UART
+
 #elif defined(REV2)
-#define ZQ_UART UART0_BASE // single UART in Rev 2
+  #define ZQ_UART UART0_BASE // single UART in Rev 2
+
 #endif
 
 #define SYSTEM_STACK_SIZE 128
