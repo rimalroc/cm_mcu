@@ -57,11 +57,7 @@
 #include "portmacro.h"
 #include "Semaphore.h"
 
-<<<<<<< HEAD
 #define I2C0_SLAVE_ADDRESS 0x40
-=======
-//#define I2C0_SLAVE_ADDRESS 0x40
->>>>>>> master
 
 uint32_t g_ui32SysClock = 0;
 
@@ -71,19 +67,11 @@ void Print(const char *str)
   {
 
 #ifdef DEVBOARD
-<<<<<<< HEAD
-=======
-  #define FP_UART UART0_BASE // debug UART
->>>>>>> master
   UARTPrint(FP_UART, str);
 #elif REV1
     UARTPrint(FP_UART, str);
 #endif // REV1
-<<<<<<< HEAD
 //    UARTPrint(ZQ_UART, str);
-=======
-    UARTPrint(ZQ_UART, str);
->>>>>>> master
   }
   xSemaphoreGive(xUARTMutex);
   return;
@@ -115,20 +103,12 @@ void SystemInit(void)
   PinoutSet();
 
 }
-<<<<<<< HEAD
 #ifdef DEVBOARD
-=======
-
->>>>>>> master
 void SystemInit_MPI(void)
 {
       //
     // Set the clocking to run directly from the crystal at 120MHz.
     //
-<<<<<<< HEAD
-
-=======
->>>>>>> master
     g_ui32SysClock = MAP_SysCtlClockFreqSet((SYSCTL_XTAL_25MHZ |
                                              SYSCTL_OSC_MAIN |
                                              SYSCTL_USE_PLL |
@@ -136,7 +116,6 @@ void SystemInit_MPI(void)
 
   PinoutSet();
 }
-<<<<<<< HEAD
 #endif
 // This set of functions partially contains calls that require
 // the FreeRTOS to be further configured.
@@ -156,20 +135,6 @@ void SystemInit_MPI(void)
     UART4Init(g_ui32SysClock); // front panel UART in Rev1 and Zynq comms in Rev2
   #endif
     
-=======
-// This set of functions partially contains calls that require
-// the FreeRTOS to be further configured.
-/* void SystemInitInterrupts(void)
-{
-  // Set up the UARTs for the CLI
-  // this also sets up the interrupts
-#if defined(REV1)
-  UART1Init(g_ui32SysClock); // ZYNQ UART
-#elif defined(REV2)
-  UART0Init(g_ui32SysClock); // ZYNQ UART
-#endif
-  UART4Init(g_ui32SysClock); // front panel UART in Rev1 and Zynq comms in Rev2
->>>>>>> master
 
   // initialize the ADCs.
   ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_ADC0);
@@ -194,7 +159,6 @@ void SystemInit_MPI(void)
 
 #if defined(REV1) || defined(REV2)
   // Set up the I2C controllers
-<<<<<<< HEAD
   initI2C0(g_ui32SysClock); // Slave controller RR: for IPMC?
   initI2C1(g_ui32SysClock); // controller for ...
   initI2C2(g_ui32SysClock); // controller for ...
@@ -205,27 +169,11 @@ void SystemInit_MPI(void)
   initI2C6(g_ui32SysClock); // controller for ...
 #elif defined(REV2)
   initI2C5(g_ui32SysClock);  // controller for ...
-=======
-  initI2C0(g_ui32SysClock); // Slave controller
-  initI2C1(g_ui32SysClock); // controller for power supplies
-  initI2C2(g_ui32SysClock); // controller for clocks
-  initI2C3(g_ui32SysClock); // controller for V (F2) optics
-  initI2C4(g_ui32SysClock); // controller for K (F1) optics
-#endif
-#if defined(REV1)
-  initI2C6(g_ui32SysClock); // controller for FPGAs
-#elif defined(REV2)
-  initI2C5(g_ui32SysClock);  // controller for FPGAs
->>>>>>> master
 #endif
 
   // smbus
   // Initialize the master SMBus port.
   //
-<<<<<<< HEAD
-
-=======
->>>>>>> master
   SMBusMasterInit(&g_sMaster1, I2C1_BASE, g_ui32SysClock);
   SMBusMasterInit(&g_sMaster2, I2C2_BASE, g_ui32SysClock);
   SMBusMasterInit(&g_sMaster3, I2C3_BASE, g_ui32SysClock);
@@ -273,12 +221,8 @@ void SystemInit_MPI(void)
   //
   // MAP_IntMasterEnable(); the FreeRTOS kernel does this at the appropriate moment
 
-<<<<<<< HEAD
 // RR: Find the correct pins for MPI!!!
 //  setupActiveLowPins();
-=======
-  setupActiveLowPins();
->>>>>>> master
 
 #ifdef REV2
   // RTC in the Hibernation module
@@ -288,11 +232,6 @@ void SystemInit_MPI(void)
   // SYSTICK timer -- this is already enabled in the portable layer
   return;
 }
-<<<<<<< HEAD
-
-=======
- */
->>>>>>> master
 volatile uint32_t g_ui32SysTickCount;
 
 CommandLineTaskArgs_t cli_uart;
@@ -325,18 +264,12 @@ const char *gitVersion(void)
 //
 int main(void)
 {
-<<<<<<< HEAD
   // 
 #ifdef DEVBOARD
   SystemInit_MPI();
 #else
   SystemInit();
 #endif
-=======
-  // SystemInit();
-  SystemInit_MPI();
-
->>>>>>> master
 //  initFPGAMon();
 
   // all facilities start at INFO
@@ -346,10 +279,7 @@ int main(void)
   log_set_level(LOG_ERROR, LOG_MON); // for now
 
   // Initialize all semaphores
-<<<<<<< HEAD
   // RR: in this function also create more semaphores for more I2C
-=======
->>>>>>> master
   initSemaphores();
   /*
   dcdc_args.xSem = i2c1_sem;
@@ -366,7 +296,6 @@ int main(void)
 
   //  Create the stream buffers that sends data from the interrupt to the
   //  task, and create the task.
-<<<<<<< HEAD
 #ifdef DEVBOARD
   // There are two buffers for the two CLIs (debug and "Zynq")
 /*
@@ -382,9 +311,6 @@ int main(void)
   cli_uart.UartStreamBuffer = xUART0StreamBuffer;
     cli_uart.stack_size = 4096U;
 #elif REV1
-=======
-#ifdef REV1
->>>>>>> master
   // There are two buffers for the two CLIs (front panel and Zynq)
   xUART4StreamBuffer = xStreamBufferCreate(128, // length of stream buffer in bytes
                                            1);  // number of items before a trigger is sent
@@ -419,11 +345,7 @@ int main(void)
   */
   xTaskCreate(vCommandLineTask, "CLIZY", 512, &cli_uart, tskIDLE_PRIORITY + 4, NULL);
 #ifdef REV1
-<<<<<<< HEAD
 //  xTaskCreate(vCommandLineTask, "CLIFP", 512, &cli_uart4, tskIDLE_PRIORITY + 4, NULL);
-=======
-  xTaskCreate(vCommandLineTask, "CLIFP", 512, &cli_uart4, tskIDLE_PRIORITY + 4, NULL);
->>>>>>> master
 #endif // REV1
 /*   xTaskCreate(ADCMonitorTask, "ADC", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 4, NULL);
 
@@ -480,25 +402,7 @@ int main(void)
  */
   // Set up the hardware ready to run the firmware. Don't do this earlier as
   // the interrupts call some FreeRTOS tasks that need to be set up first.
-<<<<<<< HEAD
   SystemInitInterrupts();
-=======
-  //SystemInitInterrupts();
-
-// instead only these by now
-#if defined(DEVBOARD)
-  #ifdef TM4C129ENCPDT 
-    UART0Init(g_ui32SysClock); // debug uart
-  #else
-    #warning "UART not defined here"
-  #endif
-#elif defined(REV1)
-    UART1Init(g_ui32SysClock); // ZYNQ UART
-#elif defined(REV2)
-  UART0Init(g_ui32SysClock); // ZYNQ UART
-#endif
-  UART4Init(g_ui32SysClock); // front panel UART in Rev1 and Zynq comms in Rev2
->>>>>>> master
 
 
 
@@ -507,12 +411,9 @@ int main(void)
   Print("\r\n----------------------------\r\n");
   Print("Staring Apollo CM MCU firmware ");
   Print(gitVersion());
-<<<<<<< HEAD
 #ifdef DEVBOARD
   Print("\r\nDEVBOARD\r\n");
 #endif
-=======
->>>>>>> master
 #ifdef REV1
   Print("\r\nRev1 build\r\n");
 #elif defined(REV2)

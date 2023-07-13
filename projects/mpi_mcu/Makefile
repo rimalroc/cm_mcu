@@ -9,6 +9,9 @@
 #
 PART?=TM4C1290NCPDT
 $(info compiling mpi_mcu for PART = $(PART))
+ifdef DEVBOARD
+$(info compiling mpi_mcu for Development board)
+endif 
 #
 # The base directory for TivaWare.
 #
@@ -26,13 +29,11 @@ include ${ROOT}/makedefs
 ifndef DEBUG
 CFLAGS+=-Werror
 endif 
-<<<<<<< HEAD
 ifdef DEVBOARD
 CFLAGS += -DDEVBOARD
 endif 
-=======
 
->>>>>>> master
+
 ifdef REV2
 CFLAGS += -DREV2
 endif 
@@ -100,12 +101,16 @@ ${COMPILER}:
 # Rules for building the project
 # 
 ${COMPILER}/mpi_mcu.axf: ${COMPILER}/mpi_mcu.o
+ifdef DEVBOARD
+${COMPILER}/mpi_mcu.axf: ${COMPILER}/pinout_devboard.o
+else
 ifdef REV1
 ${COMPILER}/mpi_mcu.axf: ${COMPILER}/pinout_rev1.o
 endif
 ifdef REV2
 ${COMPILER}/mpi_mcu.axf: ${COMPILER}/pinout_rev2.o
 endif 
+endif
 ${COMPILER}/mpi_mcu.axf: ${COMPILER}/pinsel.o
 ${COMPILER}/mpi_mcu.axf: ${COMPILER}/i2c_reg.o
 ${COMPILER}/mpi_mcu.axf: ${COMPILER}/LocalUart.o
@@ -159,8 +164,13 @@ ${COMPILER}/mpi_mcu.axf: ${COMPILER}/hibernate.o
 ${COMPILER}/mpi_mcu.axf: ${COMPILER}/adc.o
 
 #${COMPILER}/mpi_mcu.axf: ${ROOT}/driverlib/${COMPILER}/libdriver.a
+ifdef DEVBOARD
+${COMPILER}/mpi_mcu.axf: mpi_mcu_devboard.ld
+SCATTERgcc_mpi_mcu=mpi_mcu_devboard.ld
+else
 ${COMPILER}/mpi_mcu.axf: mpi_mcu.ld
 SCATTERgcc_mpi_mcu=mpi_mcu.ld
+endif 
 ENTRY_mpi_mcu=ResetISR
 CFLAGS+=-DTARGET_IS_TM4C129_RA1 -DUSE_FREERTOS
 

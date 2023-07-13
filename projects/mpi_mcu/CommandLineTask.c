@@ -423,17 +423,12 @@ static struct command_t commands[] = {
     },
 
 };
-<<<<<<< HEAD
 #ifdef DEVBOARD
 static void U0Print(const char *str)
 {
   UARTPrint(UART0_BASE, str);
 }
 #elif defined(REV1)
-=======
-
-#ifdef REV1
->>>>>>> master
 static void U4Print(const char *str)
 {
   UARTPrint(UART4_BASE, str);
@@ -543,14 +538,9 @@ void vCommandLineTask(void *pvParameters)
   struct microrl_user_data_t rl_userdata = {
       .uart_base = uart_base,
   };
-<<<<<<< HEAD
 #ifdef DEVBOARD
   void (*printer)(const char *) = U0Print;
 #elif defined(REV1)
-=======
-
-#ifdef REV1
->>>>>>> master
   void (*printer)(const char *) = U4Print;
 #elif defined(REV2)
   void (*printer)(const char *) = U0Print;
@@ -564,13 +554,9 @@ void vCommandLineTask(void *pvParameters)
       .prompt_length = 2,
       .userdata = &rl_userdata,
   };
-<<<<<<< HEAD
 #ifdef DEVBOARD
 //nothing
 #elif defined(REV1)
-=======
-#ifdef REV1
->>>>>>> master
   // this is a hack
   if (uart_base == UART1_BASE) {
     rl_config.print = U1Print; // switch to Zynq
