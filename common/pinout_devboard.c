@@ -70,8 +70,11 @@
 void
 PinoutSet(void)
 {
-    #if defined(PART_TM4C1290NCPDT) 
-    //
+#if defined(PART_TM4C1294NCPDT)
+#warning "using alternative pins definition"
+
+
+
     // Enable Peripheral Clocks 
     //
 	MAP_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
@@ -583,46 +586,46 @@ PinoutSet(void)
 	MAP_GPIOPinTypeI2C(GPIO_PORTG_BASE, GPIO_PIN_1);
 
     //
-    // Configure the GPIO Pin Mux for PG2
+    // Configure the GPIO Pin Mux for PL1
 	// for I2C2SCL
     //
-	MAP_GPIOPinConfigure(GPIO_PG2_I2C2SCL);
-	MAP_GPIOPinTypeI2CSCL(GPIO_PORTG_BASE, GPIO_PIN_2);
+	MAP_GPIOPinConfigure(GPIO_PL1_I2C2SCL);
+	MAP_GPIOPinTypeI2CSCL(GPIO_PORTL_BASE, GPIO_PIN_1);
 
     //
-    // Configure the GPIO Pin Mux for PG3
+    // Configure the GPIO Pin Mux for PN4
 	// for I2C2SDA
     //
-	MAP_GPIOPinConfigure(GPIO_PG3_I2C2SDA);
-	MAP_GPIOPinTypeI2C(GPIO_PORTG_BASE, GPIO_PIN_3);
+	MAP_GPIOPinConfigure(GPIO_PN4_I2C2SDA);
+	MAP_GPIOPinTypeI2C(GPIO_PORTN_BASE, GPIO_PIN_4);
 
     //
-    // Configure the GPIO Pin Mux for PG4
+    // Configure the GPIO Pin Mux for PK4
 	// for I2C3SCL
     //
-	MAP_GPIOPinConfigure(GPIO_PG4_I2C3SCL);
-	MAP_GPIOPinTypeI2CSCL(GPIO_PORTG_BASE, GPIO_PIN_4);
+	MAP_GPIOPinConfigure(GPIO_PK4_I2C3SCL);
+	MAP_GPIOPinTypeI2CSCL(GPIO_PORTK_BASE, GPIO_PIN_4);
 
     //
-    // Configure the GPIO Pin Mux for PG5
+    // Configure the GPIO Pin Mux for PK5
 	// for I2C3SDA
     //
-	MAP_GPIOPinConfigure(GPIO_PG5_I2C3SDA);
-	MAP_GPIOPinTypeI2C(GPIO_PORTG_BASE, GPIO_PIN_5);
+	MAP_GPIOPinConfigure(GPIO_PK5_I2C3SDA);
+	MAP_GPIOPinTypeI2C(GPIO_PORTK_BASE, GPIO_PIN_5);
 
     //
-    // Configure the GPIO Pin Mux for PG6
+    // Configure the GPIO Pin Mux for PK6
 	// for I2C4SCL
     //
-	MAP_GPIOPinConfigure(GPIO_PG6_I2C4SCL);
-	MAP_GPIOPinTypeI2CSCL(GPIO_PORTG_BASE, GPIO_PIN_6);
+	MAP_GPIOPinConfigure(GPIO_PK6_I2C4SCL);
+	MAP_GPIOPinTypeI2CSCL(GPIO_PORTK_BASE, GPIO_PIN_6);
 
     //
-    // Configure the GPIO Pin Mux for PG7
+    // Configure the GPIO Pin Mux for PK7
 	// for I2C4SDA
     //
-	MAP_GPIOPinConfigure(GPIO_PG7_I2C4SDA);
-	MAP_GPIOPinTypeI2C(GPIO_PORTG_BASE, GPIO_PIN_7);
+	MAP_GPIOPinConfigure(GPIO_PK7_I2C4SDA);
+	MAP_GPIOPinTypeI2C(GPIO_PORTK_BASE, GPIO_PIN_7);
 
     //
     // Configure the GPIO Pin Mux for PA6
@@ -679,29 +682,8 @@ PinoutSet(void)
     //
 	MAP_GPIOPinConfigure(GPIO_PA3_U4TX);
 	MAP_GPIOPinTypeUART(GPIO_PORTA_BASE, GPIO_PIN_3);
-
-#else
-#ifdef PART_TM4C129ENCPDT 
-#warning "using alternative pins definition"
-
-    //
-    // Enable the GPIO port that is used for the on-board LED.
-    //
-    ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPION);
-
-    //
-    // Enable the GPIO pins for the LED (PN0).
-    //
-    ROM_GPIOPinTypeGPIOOutput(GPIO_PORTN_BASE, GPIO_PIN_0);
-
-    //
-    // Enable the peripherals used by this example.
-    //
-    ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_UART0);
-    ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
-
 #endif
-#endif
+
 }
 
 //*****************************************************************************

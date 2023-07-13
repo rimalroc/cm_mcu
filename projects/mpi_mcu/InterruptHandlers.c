@@ -43,10 +43,13 @@
 #include "semphr.h"
 #include "portmacro.h"
 
+<<<<<<< HEAD
 #ifdef DEVBOARD
 StreamBufferHandle_t xUART0StreamBuffer;
 //StreamBufferHandle_t xUART1StreamBuffer;
 #endif
+=======
+>>>>>>> master
 #if defined(REV1)
 // Stream buffers for UART communication
 StreamBufferHandle_t xUART4StreamBuffer, xUART1StreamBuffer;
@@ -54,7 +57,11 @@ StreamBufferHandle_t xUART4StreamBuffer, xUART1StreamBuffer;
 StreamBufferHandle_t xUART0StreamBuffer;
 #endif // Revision
 
+<<<<<<< HEAD
 #if defined(REV2) || defined(DEVBOARD)
+=======
+#if defined(REV2)
+>>>>>>> master
 void UART0IntHandler(void)
 {
   BaseType_t xHigherPriorityTaskWoken = pdFALSE;

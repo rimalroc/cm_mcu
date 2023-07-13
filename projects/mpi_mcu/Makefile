@@ -26,9 +26,13 @@ include ${ROOT}/makedefs
 ifndef DEBUG
 CFLAGS+=-Werror
 endif 
+<<<<<<< HEAD
 ifdef DEVBOARD
 CFLAGS += -DDEVBOARD
 endif 
+=======
+
+>>>>>>> master
 ifdef REV2
 CFLAGS += -DREV2
 endif 

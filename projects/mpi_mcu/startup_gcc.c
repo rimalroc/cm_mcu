@@ -88,14 +88,22 @@ __attribute__((section(".isr_vector"))) void (*const g_pfnVectors[])(void) = {
     IntDefaultHandler,   // GPIO Port C
     IntDefaultHandler,   // GPIO Port D
     IntDefaultHandler,   // GPIO Port E
+<<<<<<< HEAD
 #if  defined(REV2) || defined(DEVBOARD)
+=======
+#ifdef REV2
+>>>>>>> master
     UART0IntHandler, // UART0 Rx and Tx
 #else
     IntDefaultHandler, // UART0 Rx and Tx
 #endif
+<<<<<<< HEAD
 #if defined(DEVBOARD)
     IntDefaultHandler, // UART1 Rx and Tx
 #elif defined(REV1)
+=======
+#ifdef REV1
+>>>>>>> master
     UART1IntHandler, // UART1 Rx and Tx -- ZYNQ UART
 #else
     IntDefaultHandler, // UART1 Rx and Tx
@@ -154,8 +162,12 @@ __attribute__((section(".isr_vector"))) void (*const g_pfnVectors[])(void) = {
     IntDefaultHandler,      // SSI2 Rx and Tx
     IntDefaultHandler,      // SSI3 Rx and Tx
     IntDefaultHandler,      // UART3 Rx and Tx
+<<<<<<< HEAD
 //#ifdef REV1
 #ifndef REV1
+=======
+#ifdef REV1
+>>>>>>> master
     UART4IntHandler, // UART4 Rx and Tx -- FRONT PANEL
 #else
     IntDefaultHandler, // UART4 Rx and Tx
