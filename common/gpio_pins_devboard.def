@@ -1,0 +1,6 @@
+   X(TM4C_DIP_SW_2, 1, J, 0, true) 
+   X(TM4C_LED_BLUE, 2, N, 0, false) 
+   X(TM4C_LED_GREEN, 3, N, 1, false) 
+   X(TM4C_LED_RED, 4, F, 0, false) 
+   X(_V_FPGA_DONE, 5, J, 1, true) 
+#undef X

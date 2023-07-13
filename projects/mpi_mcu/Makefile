@@ -111,7 +111,7 @@ ifdef REV2
 ${COMPILER}/mpi_mcu.axf: ${COMPILER}/pinout_rev2.o
 endif 
 endif
-${COMPILER}/mpi_mcu.axf: ${COMPILER}/pinsel.o
+${COMPILER}/mpi_mcu.axf: ${COMPILER}/pinsel_MPI.o
 ${COMPILER}/mpi_mcu.axf: ${COMPILER}/i2c_reg.o
 ${COMPILER}/mpi_mcu.axf: ${COMPILER}/LocalUart.o
 ${COMPILER}/mpi_mcu.axf: ${COMPILER}/utils.o

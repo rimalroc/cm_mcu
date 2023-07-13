@@ -246,32 +246,15 @@ struct command_t {
 #define NUM_COMMANDS (sizeof(commands) / sizeof(commands[0]))
 static struct command_t commands[] = {
     {"adc", adc_ctl, "Displays a table showing the state of ADC inputs.\r\n", 0},
-    {"alm", alarm_ctl, "args: (clear|status|settemp|setvoltthres|#)\r\nGet or clear status of alarm task.\r\n",
-     -1},
+//    {"alm", alarm_ctl, "args: (clear|status|settemp|setvoltthres|#)\r\nGet or clear status of alarm task.\r\n", -1},
+#ifndef DEVBOARD
     {"bootloader", bl_ctl, "Call the boot loader\r\n", 0},
-#ifdef REV2
-    {"clkmon", clkmon_ctl, "Displays a table showing the clock chips' statuses given the clock chip id option\r\n", 1},
-#endif // REV2
-    {"clock", clock_ctl,
-     "args: (1|2)\r\nReset (1) or program the clock synthesizer to 156.25 MHz (2).\r\n", 1},
-    {"eeprom_info", eeprom_info, "Prints information about the EEPROM.\r\n", 0},
-    {"eeprom_read", eeprom_read,
-     "args: <address>\r\nReads 4 bytes from EEPROM. Address should be a multiple of 4.\r\n",
-     1},
-    {"eeprom_write", eeprom_write,
-     "args: <address> <data>\r\nWrites <data> to <address> in EEPROM. <address> should be "
-     "a multiple of 4.\r\n",
-     2},
-    {"errorlog_entry", errbuff_in,
-     "args: <data>\r\nManual entry of 2-byte code into the eeprom error logger.\r\n", 1},
-    {"errorlog", errbuff_out,
-     "args: <n>\r\nPrints last n entries in the eeprom error logger.\r\n", 1},
-    {"errorlog_info", errbuff_info,
-     "Prints information about the eeprom error logger.\r\n", 0},
-    {"errorlog_reset", errbuff_reset,
-     "Resets the eeprom error logger.\r\n", 0},
-    {"first_mcu", first_mcu_ctl, "args: <board #> <revision #>\r\n Detect first-time setup of MCU and prompt loading internal EEPROM configuration\r\n", 4},
-    {"fpga_reset", fpga_reset, "Reset Kintex (k) or Virtex (V) FPGA\r\n", 1},
+#endif
+//    {"clkmon", clkmon_ctl, "Displays a table showing the clock chips' statuses given the clock chip id option\r\n", 1},
+//    {"clock", clock_ctl,
+//     "args: (1|2)\r\nReset (1) or program the clock synthesizer to 156.25 MHz (2).\r\n", 1},
+//    {"fpga_reset", fpga_reset, "Reset Kintex (k) or Virtex (V) FPGA\r\n", 1},
+/*
     {"ff", ff_ctl,
      "args: (xmit|cdr on/off (0-23|all)) | regw reg# val (0-23|all) | regr reg# (0-23)\r\n"
      " Firefly controlling and monitoring commands\r\n",
@@ -302,79 +285,43 @@ static struct command_t commands[] = {
     },
     {"fpga", fpga_ctl, "Displays a table showing the state of FPGAs.\r\n",
      -1},
-    {
-        "gpio",
-        gpio_ctl,
-        "Get or set any GPIO pin.\r\n",
-        -1,
-    },
+*/
+    { "gpio",
+      gpio_ctl,
+      "Get or set any GPIO pin.\r\n",
+      -1,},
     {"help", help_command_fcn, "This help command\r\n", -1},
-    {"id", board_id_info, "Prints board ID information.\r\n", 0},
-    {"i2cr", i2c_ctl_r,
-     "args: <dev> <address> <number of bytes>\r\nRead I2C controller. Addr in hex.\r\n", 3},
-    {"i2crr", i2c_ctl_reg_r,
-     "i2crr <dev> <address> <n reg addr bytes> <reg addr> <n data bytes> \r\n Read I2C controller. Addr in hex\r\n", 5},
-    {"i2cw", i2c_ctl_w, "i2cw <dev> <address> <number of bytes> <value>\r\n Write I2C controller.\r\n",
-     4},
-    {"i2cwr", i2c_ctl_reg_w,
-     "args: <dev> <address> <number of reg bytes> <reg> <number of bytes>\r\nWrite I2C controller.\r\n", 6},
-    {
-        "i2c_scan",
-        i2c_scan,
-        "Scan current I2C bus.\r\n",
-        1,
-    },
-#ifdef REV2
-    {
-        "jtag_sm",
-        jtag_sm_ctl,
-        "(on|off) set the JTAG from SM or not\r\n",
-        -1,
-    },
-    {
-        "loadclock",
-        init_load_clock_ctl,
-        "args: the clock id options to program are r0a:0, r0b:1, r1a:2, r1b:3 and r1c:4.\r\n",
-        1,
-    },
-#endif // REV2
-    {
-        "log",
-        log_ctl,
-        "args: (<fac> debug|toggle|info|warn|fatal|trace)(status|quiet)\r\nManipulate logger levels\r\n",
-        -1,
-    },
-    {"led", led_ctl, "Manipulate red LED.\r\n", 1},
-    {"mem", mem_ctl, "Size of heap.\r\n", 0},
-    {
-        "pwr",
-        power_ctl,
-        "args: (on|off|status|clearfail)\r\nTurn on or off all power, get status or clear "
-        "failures.\r\n",
-        1,
-    },
+//    {"id", board_id_info, "Prints board ID information.\r\n", 0},
+//    {"i2cr", i2c_ctl_r,
+//     "args: <dev> <address> <number of bytes>\r\nRead I2C controller. Addr in hex.\r\n", 3},
+//    {"i2crr", i2c_ctl_reg_r,
+//     "i2crr <dev> <address> <n reg addr bytes> <reg addr> <n data bytes> \r\n Read I2C controller. Addr in hex\r\n", 5},
+//    {"i2cw", i2c_ctl_w, "i2cw <dev> <address> <number of bytes> <value>\r\n Write I2C controller.\r\n",
+//     4},
+//    {"i2cwr", i2c_ctl_reg_w,
+//     "args: <dev> <address> <number of reg bytes> <reg> <number of bytes>\r\nWrite I2C controller.\r\n", 6},
+//    { "i2c_scan",
+//        i2c_scan,
+//        "Scan current I2C bus.\r\n",
+//        1},
+
+//    {
+//        "loadclock",
+//        init_load_clock_ctl,
+//        "args: the clock id options to program are r0a:0, r0b:1, r1a:2, r1b:3 and r1c:4.\r\n",
+//        1},
+
+//    {"led", led_ctl, "Manipulate red LED.\r\n", 1},
+//    {"mem", mem_ctl, "Size of heap.\r\n", 0},
+//    { "pwr",
+//        power_ctl,
+//        "args: (on|off|status|clearfail)\r\nTurn on or off all power, get status or clear "
+//        "failures.\r\n",
+//        1 },
     {"psmon", psmon_ctl, "Displays a table showing the state of power supplies.\r\n", 1},
-    {"psreg", psmon_reg, "<which> <reg>. which: LGA80D (10*dev+page), reg: reg address in hex\r\n", 2},
     {"restart_mcu", restart_mcu, "Restart the microcontroller\r\n", 0},
-    {"semaphore", sem_ctl, "args: (none)|<i2cdev 1-6> <take|release>\r\nTake or release a semaphore\r\n", -1},
-    {"snapshot", snapshot,
-     "args:# (0|1)\r\nDump snapshot register. #: which of 5 LGA80D (10*dev+page). 0|1 decide "
-     "if to reset snapshot.\r\n",
-     2},
-    {"sn_all", sn_all, "reset all LGA80Ds snapshot registers\r\n", 0},
-    {
-        "set_id",
-        set_board_id,
-        "args: <passwd> <addr> <data>\r\nAllows the user to set the board id "
-        "information.\r\n",
-        3,
-    },
-    {
-        "set_id_password",
-        set_board_id_password,
-        "One-time use: sets password for ID block.\r\n",
-        0,
-    },
+//    {"semaphore", sem_ctl, "args: (none)|<i2cdev 1-6> <take|release>\r\nTake or release a semaphore\r\n", -1},
+
     {
         "simple_sensor",
         sensor_summary,
@@ -396,31 +343,12 @@ static struct command_t commands[] = {
     {"taskstats",
      TaskStatsCommand,
      "Displays a table showing the state of each FreeRTOS task\r\n", 0},
-#ifdef REV2
-    {
-        "time",
-        time_ctl,
-        "(set HH:MM:SS MM/DD/YYYY|<none)\r\nRTC set and display\r\n",
-        -1,
-    },
-#endif // REV2
+
     {"uptime", uptime, "Display uptime in minutes\r\n", 0},
     {"version", ver_ctl, "Display information about MCU firmware version\r\n", 0},
-#ifdef REV2
-    {"v38", v38_ctl, "Control 3V8 FF supply\r\n", 2},
-#endif // REV2
+
     {"watchdog", watchdog_ctl, "Display status of the watchdog task\r\n", 0},
-    {
-        "zmon",
-        zmon_ctl,
-#ifdef ZYNQMON_TEST_MODE
-        "args:(on|off|status|debug1|debug2|debugraw|normal|sendone|(settest <sensor> <val>))\r\n"
-#else
-        "args:(on|off)\r\n"
-#endif // ZYNQMON_TEST_MODE
-        " Control ZynqMon task.\r\n",
-        -1,
-    },
+
 
 };
 #ifdef DEVBOARD
