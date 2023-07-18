@@ -1,0 +1,23 @@
+// X-macros file for I2C pins, L0MDT
+// 07/2023
+// Format: Name, External pin, GPIO Port, GPIO Port pin, i2c dev, reset pin
+X(ZUP_PM_SCL,   91, B, 2, 0, none) 
+X(ZUP_PM_SDA,   92, B, 3, 0, none) 
+X(KUP_PM_SCL,   49, G, 0, 1, none) 
+X(KUP_PM_SDA,   50, G, 1, 1, none) 
+X(FIREFLY_SCL,  51, G, 2, 2, I2C_nRST) 
+X(FIREFLY_SDA,  52, G, 3, 2, I2C_nRST) 
+X(CLK_SCL,      53, G, 4, 3, I2C_nRST) 
+X(CLK_SDA,      54, G, 5, 3, I2C_nRST) 
+X(TEMP_MON_SCL, 55, G, 6, 4, none) 
+X(TEMP_MON_SDA, 56, G, 7, 4, none) 
+X(KUP_SYSMON_SCL, 95, B, 0, 5, none) 
+X(KUP_SYSMON_SDA, 96, B, 1, 5, none) 
+X(ZUP_SYSMON_SCL, 40, A, 6, 6, none) 
+X(ZUP_SYSMON_SDA, 41, A, 7, 6, none) 
+X(MCU_IPMC_ZUP_SCL, 1, D, 0, 7, none) 
+X(MCU_IPMC_ZUP_SDA, 2, D, 1, 7, none) 
+X(KUP_RESERVED_SCL, 3, D, 2, 8, none) 
+X(KUP_RESERVED_SCL, 4, D, 3, 8, none) 
+//PA0_I2C9_SCL_U0RX
+#undef X

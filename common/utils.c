@@ -109,6 +109,7 @@ uint8_t toggle_gpio_pin(int pin)
   return val;
 }
 
+#if defined(REV1) || defined(REV2)
 // Set up all the active low pins to be off (i.e., high)
 static const int pins[] = {
     _FPGA_I2C_RESET,      //
@@ -129,7 +130,7 @@ void setupActiveLowPins(void)
     write_gpio_pin(pins[i], 0x1);
   }
 }
-
+#endif //defined(REV1) || defined(REV2)
 // EEPROM Buffer
 
 // error codes. these should correspond to the names in utils.h

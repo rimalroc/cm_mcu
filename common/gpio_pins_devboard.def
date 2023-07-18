@@ -1,6 +1,11 @@
-   X(TM4C_DIP_SW_2, 1, J, 0, true) 
-   X(TM4C_LED_BLUE, 2, N, 0, false) 
-   X(TM4C_LED_GREEN, 3, N, 1, false) 
-   X(TM4C_LED_RED, 4, F, 0, false) 
-   X(_V_FPGA_DONE, 5, J, 1, true) 
+   X(TM4C_DIP_SW_2,  1,    J, 1, true, GPIO_PIN_TYPE_STD_WPU) 
+   X(TM4C_LED_BLUE,  2,    N, 0, false, GPIO_PIN_TYPE_STD) 
+   X(TM4C_LED_GREEN, 3,    N, 1, false, GPIO_PIN_TYPE_STD) 
+   X(TM4C_LED_RED,   4,    F, 0, false, GPIO_PIN_TYPE_STD) 
+   X(_V_FPGA_DONE,   5,    J, 1, true, GPIO_PIN_TYPE_STD) 
+   X(TM4C_DIP_SW_1,  6,    J, 0, true, GPIO_PIN_TYPE_STD_WPU) 
+   // Blade control, SM_PWR_ENA and CM_READY
+   X(BLADE_POWER_OK, 7,    N, 2, false, GPIO_PIN_TYPE_STD)
+   X(BLADE_POWER_EN, 8,    N, 3, true, GPIO_PIN_TYPE_STD_WPD)
+      X(I2C_MUX_nRST, 52, Q, 6, false, GPIO_PIN_TYPE_STD)
 #undef X

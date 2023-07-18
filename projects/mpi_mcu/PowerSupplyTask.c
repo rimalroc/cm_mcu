@@ -55,6 +55,12 @@ static uint16_t getPSFailMask(void)
   static bool configured = false;
 
   static uint32_t ps_ignore_mask;
+  #if defined(DEVBOARD)
+    ps_ignore_mask = 0x0000U;
+  #elif defined (DEMO) || defined (PROTO)
+    #error "getPSFailMask not defined for DEMO or PROTO"
+  #else
+    #error "getPSFailMask: need to defined a baord type"
   if (!configured) {
     ps_ignore_mask = read_eeprom_single(EEPROM_ID_PS_IGNORE_MASK);
     if (ps_ignore_mask & ~(PS_OKS_F1_MASK_L4 | PS_OKS_F1_MASK_L5 | PS_OKS_F2_MASK_L4 | PS_OKS_F2_MASK_L5)) {
@@ -64,6 +70,7 @@ static uint16_t getPSFailMask(void)
     }
     configured = true;
   }
+  #endif
   return (uint16_t)(0xFFFFU & ps_ignore_mask); // 16 bit
 }
 
@@ -109,26 +116,26 @@ void PowerSupplyTask(void *parameters)
 {
 
   // compile-time sanity check
-  static_assert(PS_ENS_MASK == (PS_ENS_GEN_MASK | PS_ENS_F2_MASK | PS_ENS_F1_MASK), "mask");
-  static_assert(PS_OKS_MASK == (PS_OKS_GEN_MASK | PS_OKS_F2_MASK | PS_OKS_F1_MASK), "mask");
 
   // powerdown request from the CLI
   bool cli_powerdown_request = false;
 
   // masks to enable/check appropriate supplies
-  uint16_t supply_ok_mask = PS_OKS_GEN_MASK;
-  uint16_t supply_ok_mask_L1 = 0U, supply_ok_mask_L2 = 0U, supply_ok_mask_L4 = 0U,
-           supply_ok_mask_L5 = 0U;
 
-  bool f1_enable = isFPGAF1_PRESENT();
-  bool f2_enable = isFPGAF2_PRESENT();
   // HACK
   // setting the enables both to true for debugging blank bo
-  if (!f1_enable && !f2_enable) {
-    f1_enable = true;
-    f2_enable = true;
-  }
-  // end HACK
+
+  // exceptions are stored in the internal EEPROM -- the IGNORE mask.
+  ignore_mask = getPSFailMask();
+  // doing nothing with ignored mask, might be helpful in future
+//  if (ignore_mask) {  }
+
+  bool f1_enable = true; //isFPGAF1_PRESENT();
+  bool f2_enable = true; //isFPGAF2_PRESENT();
+    uint16_t supply_ok_mask = PS_OKS_GEN_MASK;
+    uint16_t supply_ok_mask_L1 = 0U, supply_ok_mask_L2 = 0U, supply_ok_mask_L4 = 0U,
+           supply_ok_mask_L5 = 0U;
+
   if (f1_enable) {
     supply_ok_mask |= PS_OKS_F1_MASK;
     supply_ok_mask_L1 = PS_OKS_F1_MASK_L1;
@@ -143,29 +150,7 @@ void PowerSupplyTask(void *parameters)
     supply_ok_mask_L4 |= supply_ok_mask_L2 | PS_OKS_F2_MASK_L4;
     supply_ok_mask_L5 |= supply_ok_mask_L4 | PS_OKS_F2_MASK_L5;
   }
-  // exceptions are stored in the internal EEPROM -- the IGNORE mask.
-  ignore_mask = getPSFailMask();
-  if (ignore_mask) {
-#define SZ 128
-    char tmp[SZ];
-    // debug the ignore mask
-    for (int i = 0; i < N_PS_OKS; ++i) {
-      BaseType_t ignored = (ignore_mask & (0x1U << i)) != 0;
-      snprintf(tmp, SZ, "%-16s: %d\r\n", oks[i].name, ignored);
-      Print(tmp);
-    }
-    log_warn(LOG_PWRCTL, "PS ignore mask is set: 0x%04x\r\n", ignore_mask);
-    supply_ok_mask &= ~ignore_mask;    // mask out the ignored bits.
-    supply_ok_mask_L1 &= ~ignore_mask; // mask out the ignored bits.
-    supply_ok_mask_L2 &= ~ignore_mask; // mask out the ignored bits.
-    supply_ok_mask_L4 &= ~ignore_mask; // mask out the ignored bits.
-    supply_ok_mask_L5 &= ~ignore_mask; // mask out the ignored bits.
-  }
-
-#if defined(ECN001) || defined(REV2)
-  // configure the LGA80D supplies. This call takes some time.
-  LGA80D_init();
-#endif // ECN001
+// Do we need to initiazile some power supply?
 
   bool power_supply_alarm = false;
   uint16_t failed_mask = 0x0U;
@@ -199,7 +184,12 @@ void PowerSupplyTask(void *parameters)
           break;
       }
     }
+    #ifdef DEVBOARD
+    bool ignorefail = true; // HACK THIS NEEDS TO BE FIXED TODO FIXME
+    #else
+    #error "need to review the sequence for DEMO and PROTO"
     bool ignorefail = false; // HACK THIS NEEDS TO BE FIXED TODO FIXME
+    #endif
     // Check the state of BLADE_POWER_EN.
     bool blade_power_enable = (read_gpio_pin(BLADE_POWER_EN) == 1);
 
@@ -211,29 +201,8 @@ void PowerSupplyTask(void *parameters)
     }
 
     // MAIN POWER SUPPLY TASK STATE MACHINE
-    // ON1 .. ON5 are the five states of the turn-on sequence
-    // OFF1 .. OFF5 are the five states of the turn-off sequence
-    // in the transition to FAIL we turn off all the supplies in sequence,
-    // even if they were not yet turned on (i.e., transition from ON3 -> FAIL)
-    //                     +-------------------+
-    //              +------+       FAIL        +<-----+
-    // +-------+    |      +--+-------------+--+      |
-    // | INIT  |    |         ^             ^         |
-    // +---+---+    v         |             |         |
-    //     |     ---+--+   +--+-+         +-+--+  +---+--+
-    //     +---->+ OFF +---> ON1+-> ....  | ON5+->+  ON  |
-    //           +--+--+   +----+         +----+  +---+--+
-    //              |            +------+             |
-    //              +-----<------| DOWN <-------------+
-    //                           +------+
+  // might be good to define the state machine as a drawing
 
-    // Nota Bene:
-    // ON3 does not have a FAIL transition because those supplies
-    // do not have a PWR_GOOD in Rev 1 of the CM
-
-    // the state you are in is the current state, so for instance
-    // there is no power_off transition in the power_off state;
-    // instead it's in the POWER_ON state (e.g.)
     enum power_system_state nextState;
     switch (currentState) {
       case POWER_INIT: {

@@ -29,22 +29,22 @@
 void InitTask(void *parameters);
 
 // ADC task
-#define ADC_CHANNEL_COUNT   21
-#define ADC_INFO_TEMP_ENTRY 20 // this needs to be manually kept correct.
-#ifdef REV1
-#define ADC_INFO_GEN_VCC_INIT_CH  0
-#define ADC_INFO_GEN_VCC_FIN_CH   5
-#define ADC_INFO_FPGA_VCC_INIT_CH 6
-#define ADC_INFO_FPGA_VCC_FIN_CH  7
-#elif defined(REV2) // REV2
-#define ADC_INFO_GEN_VCC_INIT_CH  0
-#define ADC_INFO_GEN_VCC_4V0_CH   3
-#define ADC_INFO_GEN_VCC_FIN_CH   4
-#define ADC_INFO_FPGA_VCC_INIT_CH 5
-#define ADC_INFO_FPGA_VCC_FIN_CH  12
-#define ADC_INFO_CUR_INIT_CH      13
-#define ADC_INFO_CUR_FIN_CH       17
+#ifdef DEVBOARD
+#define ADC_CHANNEL_COUNT   6
+#define ADC_INFO_TEMP_ENTRY 5 // this needs to be manually kept correct.
+
+#elif defined(DEMO)
+#define ADC_CHANNEL_COUNT   6
+#define ADC_INFO_TEMP_ENTRY 5 // this needs to be manually kept correct.
+
+#elif defined(PROTO)
+#define ADC_CHANNEL_COUNT   1
+#define ADC_INFO_TEMP_ENTRY 0 // this needs to be manually kept correct.
+
+#else
+#error Need to define either Rev1 or Rev2
 #endif
+
 
 const char *const getADCname(const int i);
 float getADCvalue(const int i);
@@ -56,21 +56,7 @@ extern QueueHandle_t xLedQueue;
 // control the LED
 void LedTask(void *parameters);
 
-#define RED_LED_OFF       (10)
-#define RED_LED_ON        (11)
-#define RED_LED_TOGGLE    (12)
-#define RED_LED_TOGGLE3   (13)
-#define RED_LED_TOGGLE4   (14)
-#define BLUE_LED_OFF      (20)
-#define BLUE_LED_ON       (21)
-#define BLUE_LED_TOGGLE   (22)
-#define BLUE_LED_TOGGLE3  (23)
-#define BLUE_LED_TOGGLE4  (24)
-#define GREEN_LED_OFF     (30)
-#define GREEN_LED_ON      (31)
-#define GREEN_LED_TOGGLE  (32)
-#define GREEN_LED_TOGGLE3 (33)
-#define GREEN_LED_TOGGLE4 (34)
+
 // Holds the handle of the created queue for the power supply task.
 
 // --- Power Supply management task
@@ -123,7 +109,7 @@ void MonitorI2CTask(void *parameters);
 #define I2C_DEVICE_CLK   2
 
 // REV1
-#ifndef REV2
+#if defined( REV2)
 #define NFIREFLY_ARG      5
 #define NFIREFLIES_F1     11
 #define NFIREFLIES_F2     14
@@ -131,7 +117,10 @@ void MonitorI2CTask(void *parameters);
 #define NFIREFLIES_DAQ_F1 3
 #define NFIREFLIES_IT_F2  4
 #define NFIREFLIES_DAQ_F2 10
-#else // REV2
+#define CLK_PAGE_COMMAND 1
+
+#define NFIREFLIES       (NFIREFLIES_F1 + NFIREFLIES_F2)
+#elif defined(REV2) // REV2
 // REV 2
 #define NFIREFLY_ARG      4
 #define NFIREFLIES_F1     10
@@ -140,9 +129,22 @@ void MonitorI2CTask(void *parameters);
 #define NFIREFLIES_DAQ_F1 4
 #define NFIREFLIES_IT_F2  6
 #define NFIREFLIES_DAQ_F2 4
-#endif // REV 2
+#define CLK_PAGE_COMMAND 1
+
+#define NFIREFLIES       (NFIREFLIES_F1 + NFIREFLIES_F2)
+#elif defined(DEVBOARD)
+#define NFIREFLY_ARG      4
+#define NFIREFLIES 20
+#elif defined(DEMO)
+#define NFIREFLY_ARG      4
+#define NFIREFLIES_F1     10
+#define NFIREFLIES_F2     10
 #define CLK_PAGE_COMMAND 1
 #define NFIREFLIES       (NFIREFLIES_F1 + NFIREFLIES_F2)
+#else
+#error must define a valid board here
+#endif // REV 2
+
 
 #define VENDOR_START_BIT_FFDAQ 168
 #define VENDOR_STOP_BIT_FFDAQ  184

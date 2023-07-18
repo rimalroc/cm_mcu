@@ -182,22 +182,37 @@ void UART4IntHandler(void)
 #endif // REV1
 
 // tSMBus g_sSlave0;  // for I2C #0
-
+tSMBus g_sMaster0; // for I2C #0
 tSMBus g_sMaster1; // for I2C #1
 tSMBus g_sMaster2; // for I2C #2
 tSMBus g_sMaster3; // for I2C #3
 tSMBus g_sMaster4; // for I2C #4
 tSMBus g_sMaster5; // for I2C #5
 tSMBus g_sMaster6; // for I2C #6
+tSMBus g_sMaster8; // for I2C #8
 
+volatile tSMBusStatus eStatus0 = SMBUS_OK;
 volatile tSMBusStatus eStatus1 = SMBUS_OK;
 volatile tSMBusStatus eStatus2 = SMBUS_OK;
 volatile tSMBusStatus eStatus3 = SMBUS_OK;
 volatile tSMBusStatus eStatus4 = SMBUS_OK;
 volatile tSMBusStatus eStatus5 = SMBUS_OK;
 volatile tSMBusStatus eStatus6 = SMBUS_OK;
+volatile tSMBusStatus eStatus8 = SMBUS_OK;
 
 // SMBUs specific handler for I2C
+void SMBusMasterIntHandler0(void)
+{
+  BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+
+  //
+  // Process the interrupt.
+  //
+  eStatus0 = SMBusMasterIntProcess(&g_sMaster0);
+  // handle errors in the returning function
+  portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+}
+
 void SMBusMasterIntHandler1(void)
 {
   BaseType_t xHigherPriorityTaskWoken = pdFALSE;
@@ -270,6 +285,17 @@ void SMBusMasterIntHandler6(void)
   portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 }
 
+void SMBusMasterIntHandler8(void)
+{
+  BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+
+  //
+  // Process the interrupt.
+  //
+  eStatus8 = SMBusMasterIntProcess(&g_sMaster8);
+  // handle errors in the returning function
+  portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+}
 // Stores the handle of the task that will be notified when the
 // ADC conversion is complete.
 TaskHandle_t TaskNotifyADC = NULL;
@@ -325,15 +351,15 @@ void ADCSeq1Interrupt(void)
 // -----------------------------------------
 TaskHandle_t TaskNotifyI2CSlave = NULL;
 
-void I2CSlave0Interrupt(void)
+void I2CSlave7Interrupt(void)
 {
   BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 
   // read the interrupt register
-  uint32_t ui32InterruptStatus = ROM_I2CSlaveIntStatusEx(I2C0_BASE, true);
+  uint32_t ui32InterruptStatus = ROM_I2CSlaveIntStatusEx(I2C7_BASE, true);
 
   // clear the interrupt register
-  ROM_I2CSlaveIntClear(I2C0_BASE);
+  ROM_I2CSlaveIntClear(I2C7_BASE);
   /* At this point xTaskToNotify should not be NULL as a transmission was
       in progress. */
   configASSERT(TaskNotifyI2CSlave != NULL);

@@ -126,7 +126,7 @@ void SystemInit_MPI(void)
   #if defined(DEVBOARD)
     UART0Init(g_ui32SysClock); // debug uart
 //    UART1Init(g_ui32SysClock); // Zynq-facing UART
-
+    UART5Init(g_ui32SysClock); // monitoring  uart
   #elif defined(REV1)
     UART1Init(g_ui32SysClock); // ZYNQ UART
     UART4Init(g_ui32SysClock); // front panel UART in Rev1 and Zynq comms in Rev2
@@ -137,24 +137,24 @@ void SystemInit_MPI(void)
     
 
   // initialize the ADCs.
-  ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_ADC0);
+//  ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_ADC0);
   ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_ADC1);
   // initialize the EEPROM.
   ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_EEPROM0);
   ROM_EEPROMInit();
   // Set the reference to external
-  ROM_ADCReferenceSet(ADC0_BASE, ADC_REF_EXT_3V);
+//  ROM_ADCReferenceSet(ADC0_BASE, ADC_REF_EXT_3V);
   ROM_ADCReferenceSet(ADC1_BASE, ADC_REF_EXT_3V);
-  ROM_ADCIntEnable(ADC0_BASE, 1); // enable interrupt for sequence 1
+//  ROM_ADCIntEnable(ADC0_BASE, 1); // enable interrupt for sequence 1
   ROM_ADCIntEnable(ADC1_BASE, 0); // enable interrupt for sequence 0
   // clear the interrupts
-  ROM_ADCIntClear(ADC0_BASE, 1);
+//  ROM_ADCIntClear(ADC0_BASE, 1);
   ROM_ADCIntClear(ADC1_BASE, 0);
   // FreeRTOS insists that the priority of interrupts be set up like this.
-  ROM_IntPrioritySet(INT_ADC0SS1, configKERNEL_INTERRUPT_PRIORITY);
+//  ROM_IntPrioritySet(INT_ADC0SS1, configKERNEL_INTERRUPT_PRIORITY);
   ROM_IntPrioritySet(INT_ADC1SS0, configKERNEL_INTERRUPT_PRIORITY);
 
-  ROM_IntEnable(INT_ADC0SS1);
+//  ROM_IntEnable(INT_ADC0SS1);
   ROM_IntEnable(INT_ADC1SS0);
 
 #if defined(REV1) || defined(REV2)
@@ -164,43 +164,50 @@ void SystemInit_MPI(void)
   initI2C2(g_ui32SysClock); // controller for ...
   initI2C3(g_ui32SysClock); // controller for ...
   initI2C4(g_ui32SysClock); // controller for ...
+#else
+initI2C_all(g_ui32SysClock);
 #endif
-#if defined(REV1)
-  initI2C6(g_ui32SysClock); // controller for ...
-#elif defined(REV2)
-  initI2C5(g_ui32SysClock);  // controller for ...
-#endif
+
+
 
   // smbus
   // Initialize the master SMBus port.
   //
+  #if defined(DEVBOARD) || defined(DEMO)
+  SMBusMasterInit(&g_sMaster0, I2C0_BASE, g_ui32SysClock);
   SMBusMasterInit(&g_sMaster1, I2C1_BASE, g_ui32SysClock);
   SMBusMasterInit(&g_sMaster2, I2C2_BASE, g_ui32SysClock);
   SMBusMasterInit(&g_sMaster3, I2C3_BASE, g_ui32SysClock);
   SMBusMasterInit(&g_sMaster4, I2C4_BASE, g_ui32SysClock);
-#if defined(REV1)
-  SMBusMasterInit(&g_sMaster6, I2C6_BASE, g_ui32SysClock);
-#elif defined(REV2)
   SMBusMasterInit(&g_sMaster5, I2C5_BASE, g_ui32SysClock);
-#endif
+  SMBusMasterInit(&g_sMaster6, I2C6_BASE, g_ui32SysClock);
+  SMBusMasterInit(&g_sMaster8, I2C8_BASE, g_ui32SysClock);
+  #else
+  #error missing definitions here
+  #endif
+
   // FreeRTOS insists that the priority of interrupts be set up like this.
   ROM_IntPrioritySet(INT_I2C0, configKERNEL_INTERRUPT_PRIORITY);
   ROM_IntPrioritySet(INT_I2C1, configKERNEL_INTERRUPT_PRIORITY);
   ROM_IntPrioritySet(INT_I2C2, configKERNEL_INTERRUPT_PRIORITY);
   ROM_IntPrioritySet(INT_I2C3, configKERNEL_INTERRUPT_PRIORITY);
   ROM_IntPrioritySet(INT_I2C4, configKERNEL_INTERRUPT_PRIORITY);
-#if defined(REV1)
-  ROM_IntPrioritySet(INT_I2C6, configKERNEL_INTERRUPT_PRIORITY);
-#elif defined(REV2)
   ROM_IntPrioritySet(INT_I2C5, configKERNEL_INTERRUPT_PRIORITY);
-#endif
+  ROM_IntPrioritySet(INT_I2C6, configKERNEL_INTERRUPT_PRIORITY);
+  ROM_IntPrioritySet(INT_I2C7, configKERNEL_INTERRUPT_PRIORITY);
+  ROM_IntPrioritySet(INT_I2C8, configKERNEL_INTERRUPT_PRIORITY);
   //
   // Enable I2C master interrupts.
   //
+  SMBusMasterIntEnable(&g_sMaster0);
   SMBusMasterIntEnable(&g_sMaster1);
   SMBusMasterIntEnable(&g_sMaster2);
   SMBusMasterIntEnable(&g_sMaster3);
   SMBusMasterIntEnable(&g_sMaster4);
+  SMBusMasterIntEnable(&g_sMaster5);
+  SMBusMasterIntEnable(&g_sMaster6);
+  SMBusMasterIntEnable(&g_sMaster8);
+
 #if defined(REV1)
   SMBusMasterIntEnable(&g_sMaster6);
 #elif defined(REV2)
@@ -265,9 +272,10 @@ const char *gitVersion(void)
 int main(void)
 {
   // 
-#ifdef DEVBOARD
+#if defined(DEVBOARD) || defined(DEMO)
   SystemInit_MPI();
 #else
+#error need to define something here
   SystemInit();
 #endif
 //  initFPGAMon();
@@ -343,13 +351,14 @@ int main(void)
   xTaskCreate(PowerSupplyTask, "POW", 2 * configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 5, NULL);
   xTaskCreate(LedTask, "LED", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 2, NULL);
   */
-  xTaskCreate(vCommandLineTask, "CLIZY", 512, &cli_uart, tskIDLE_PRIORITY + 4, NULL);
+  xTaskCreate(vCommandLineTask, "CLIZY", 512, &cli_uart, tskIDLE_PRIORITY + 3, NULL);
 #ifdef REV1
 //  xTaskCreate(vCommandLineTask, "CLIFP", 512, &cli_uart4, tskIDLE_PRIORITY + 4, NULL);
 #endif // REV1
-/*   xTaskCreate(ADCMonitorTask, "ADC", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 4, NULL);
-
-  xTaskCreate(MonitorI2CTask, "FF12", 2 * configMINIMAL_STACK_SIZE, &ffl12_f1_args, tskIDLE_PRIORITY + 4,
+  xTaskCreate(ADCMonitorTask, "ADC", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 3, NULL);
+  xTaskCreate(ZynqMonTask, "ZMON", 2 * configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 4, NULL);
+  xTaskCreate(I2CSlaveTask, "I2CS0", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 4, NULL);
+/*  xTaskCreate(MonitorI2CTask, "FF12", 2 * configMINIMAL_STACK_SIZE, &ffl12_f1_args, tskIDLE_PRIORITY + 4,
               NULL);
   xTaskCreate(MonitorI2CTask, "FFDAQ", 2 * configMINIMAL_STACK_SIZE, &ffldaq_f1_args, tskIDLE_PRIORITY + 4,
               NULL);
@@ -371,7 +380,7 @@ int main(void)
   xTaskCreate(I2CSlaveTask, "I2CS0", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 5, NULL);
   xTaskCreate(EEPROMTask, "EPRM", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 4, NULL);
   xTaskCreate(InitTask, "INIT", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 5, NULL);
-  xTaskCreate(ZynqMonTask, "ZMON", 2 * configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 5, NULL);
+  
   xTaskCreate(GenericAlarmTask, "TALM", configMINIMAL_STACK_SIZE, &tempAlarmTask,
               tskIDLE_PRIORITY + 5, NULL);
   xTaskCreate(GenericAlarmTask, "VALM", configMINIMAL_STACK_SIZE, &voltAlarmTask,
@@ -396,10 +405,10 @@ int main(void)
 
   xAlmQueue = xQueueCreate(10, sizeof(uint32_t)); // ALARM queue
   configASSERT(xAlmQueue != NULL);
-
+*/
   xZynqMonQueue = xQueueCreate(10, sizeof(uint32_t)); // Soft UART queue
   configASSERT(xZynqMonQueue != NULL);
- */
+ 
   // Set up the hardware ready to run the firmware. Don't do this earlier as
   // the interrupts call some FreeRTOS tasks that need to be set up first.
   SystemInitInterrupts();

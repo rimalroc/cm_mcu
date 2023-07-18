@@ -154,80 +154,6 @@ typedef struct __attribute__((packed)) {
 
 extern struct dev_i2c_addr_t pm_addrs_dcdc[];
 
-static BaseType_t sn_all(int argc, char **argv, char *m)
-{
-  int which = 0;
-  int page_d = 0;
-  for (; which < N_PM_ADDRS_DCDC; ++which) {
-    for (; page_d < 2; ++page_d) { // for reading two pages per device
-      bool reset = false;
-      reset = true;
-      uint8_t sn[32];
-      snapdump(&pm_addrs_dcdc[which], page_d, sn, reset);
-    }
-  }
-  return pdFALSE;
-}
-
-static BaseType_t snapshot(int argc, char **argv, char *m)
-{
-  _Static_assert(sizeof(snapshot_t) == 32, "sizeof snapshot_t");
-  int copied = 0;
-  int page = strtol(argv[1], NULL, 10); // which LGA08D
-  int which = page / 10;
-  page = page % 10;
-  if (page < 0 || page > 1) {
-    snprintf(m + copied, SCRATCH_SIZE - copied, "%s: page %d must be between 0-1\r\n",
-             argv[0], page + 1);
-    return pdFALSE;
-  }
-  if (which < 0 || which > (NSUPPLIES_PS - 1)) {
-    snprintf(m + copied, SCRATCH_SIZE - copied, "%s: device %d must be between 0-%d\r\n",
-             argv[0], which, (NSUPPLIES_PS - 1));
-    return pdFALSE;
-  }
-  copied += snprintf(m + copied, SCRATCH_SIZE - copied, "%s: page %d of device %s\r\n", argv[0],
-                     page, pm_addrs_dcdc[which].name);
-
-  bool reset = false;
-  int ireset = strtol(argv[2], NULL, 10);
-  if (ireset == 1)
-    reset = true;
-
-  uint8_t sn[32];
-  snapdump(&pm_addrs_dcdc[which], page, sn, reset);
-  snapshot_t *p0 = (snapshot_t *)&sn[0];
-  int tens, fraction;
-  float_to_ints(linear11_to_float(p0->v_in), &tens, &fraction);
-  copied += snprintf(m + copied, SCRATCH_SIZE - copied, "VIN  = %d.%02d\r\n", tens, fraction);
-  float_to_ints(linear16u_to_float(p0->v_out), &tens, &fraction);
-  copied += snprintf(m + copied, SCRATCH_SIZE - copied, "VOUT = %d.%02d\r\n", tens, fraction);
-  float_to_ints(linear11_to_float(p0->i_out), &tens, &fraction);
-  copied += snprintf(m + copied, SCRATCH_SIZE - copied, "IOUT = %d.%02d\r\n", tens, fraction);
-  float_to_ints(linear11_to_float(p0->i_out_max), &tens, &fraction);
-  copied += snprintf(m + copied, SCRATCH_SIZE - copied, "IOUT MAX = %d.%02d\r\n", tens, fraction);
-  float_to_ints(linear11_to_float(p0->duty_cycle), &tens, &fraction);
-  copied += snprintf(m + copied, SCRATCH_SIZE - copied, "duty cycle = %d.%02d\r\n", tens, fraction);
-  float_to_ints(linear11_to_float(p0->temperature), &tens, &fraction);
-  copied += snprintf(m + copied, SCRATCH_SIZE - copied, "TEMP = %d.%02d\r\n", tens, fraction);
-  float_to_ints(linear11_to_float(p0->freq), &tens, &fraction);
-  copied +=
-      snprintf(m + copied, SCRATCH_SIZE - copied, "switching freq = %d.%02d\r\n", tens, fraction);
-  copied +=
-      snprintf(m + copied, SCRATCH_SIZE - copied, "VOUT  STATUS: 0x%02x\r\n", p0->v_out_status);
-  copied +=
-      snprintf(m + copied, SCRATCH_SIZE - copied, "IOUT  STATUS: 0x%02x\r\n", p0->i_out_status);
-  copied +=
-      snprintf(m + copied, SCRATCH_SIZE - copied, "INPUT STATUS: 0x%02x\r\n", p0->input_status);
-  copied += snprintf(m + copied, SCRATCH_SIZE - copied, "TEMP  STATUS: 0x%02x\r\n",
-                     p0->temperature_status);
-  copied += snprintf(m + copied, SCRATCH_SIZE - copied, "CML   STATUS: 0x%02x\r\n", p0->cml_status);
-  copied += snprintf(m + copied, SCRATCH_SIZE - copied, "MFR   STATUS: 0x%02x\r\n", p0->mfr_status);
-  copied +=
-      snprintf(m + copied, SCRATCH_SIZE - copied, "flash STATUS: 0x%02x\r\n", p0->flash_status);
-
-  return pdFALSE;
-}
 
 static BaseType_t help_command_fcn(int argc, char **, char *m);
 
@@ -318,7 +244,7 @@ static struct command_t commands[] = {
 //        "args: (on|off|status|clearfail)\r\nTurn on or off all power, get status or clear "
 //        "failures.\r\n",
 //        1 },
-    {"psmon", psmon_ctl, "Displays a table showing the state of power supplies.\r\n", 1},
+//    {"psmon", psmon_ctl, "Displays a table showing the state of power supplies.\r\n", 1},
     {"restart_mcu", restart_mcu, "Restart the microcontroller\r\n", 0},
 //    {"semaphore", sem_ctl, "args: (none)|<i2cdev 1-6> <take|release>\r\nTake or release a semaphore\r\n", -1},
 

@@ -58,7 +58,7 @@ struct gpio_pin_t oks[] = {
     { VCC_1V8_PG, "VCC_1V8_PG",   2},
     { VCC_3V3_PG, "VCC_3V3_PG",  2},
     { F2_MGTY1_AVCC_OK, "F2_MGTY1_AVCC_OK", 4},
-    { F2_MGTY2_AVCC_OK, "F2_MGTY2_AVCC_OK", 4},
+    { F2_MGTY2_AVCC_OK, "F2_MGTY2_AVCC_OK", 4},ignore_mask
     { F1_MGTY_AVCC_OK,  "F1_MGTY_AVCC_OK", 4},
     { F1_MGTH_AVCC_OK, "F1_MGTH_AVCC_OK", 4},
     { F1_MGTY_AVTT_OK, "F1_MGTY_AVTT_OK", 5},
@@ -107,7 +107,20 @@ struct gpio_pin_t oks[N_PS_OKS] = {
     { PG_F2_AVTT, "PG_F2_AVTT", 5},
     //{ PG_4V0, "PG_4V0", 6},  // enable_3v8(true/false) won't change PG_4V0. Only within 10s after 4.0V off, PG_4V0 can be 0x0.
 };
+#elif defined(DEVBOARD)
+static const struct gpio_pin_t enables[] = {
+    {  BLADE_POWER_OK, "BLADE_POWER_EN", 1},
 
+};
+const
+struct gpio_pin_t oks[N_PS_OKS] = {
+    { BLADE_POWER_OK, "BLADE_POWER_OK", 1},
+    //{ PG_4V0, "PG_4V0", 6},  // enable_3v8(true/false) won't change PG_4V0. Only within 10s after 4.0V off, PG_4V0 can be 0x0.
+};
+#elif defined(DEMO)
+#warning "pins for Demo havne't been defined"
+#elif defined(PROTO)
+#warning "pins for Demo havne't been defined"
 #else
 #error "Unknown board revision"
 #endif // REV2
@@ -185,13 +198,14 @@ bool disable_ps(void)
 // which references entries in the enables[] array.
 bool turn_on_ps(uint16_t ps_en_mask)
 {
+  #ifndef DEVBOARD
   // if blade_power_en is false, return with failure
   bool blade_power_en = (read_gpio_pin(BLADE_POWER_EN) == 1);
   if (!blade_power_en) {
     write_gpio_pin(BLADE_POWER_OK, 0x0);
     return false;
   }
-
+  #endif
   // loop over the enables
   for (int prio = 1; prio <= PS_NUM_PRIORITIES; ++prio) {
     // enable the supplies at the relevant priority
@@ -209,6 +223,7 @@ bool turn_on_ps(uint16_t ps_en_mask)
   return true;
 }
 
+#if defined(REV1) || defined (REV2)
 // Enable supply at some priority. Also send in vu and ku enable.
 void turn_on_ps_at_prio(bool f2_enable, bool f1_enable, int prio)
 {
@@ -238,6 +253,7 @@ void turn_on_ps_at_prio(bool f2_enable, bool f1_enable, int prio)
     }
   }
 }
+#endif
 
 void blade_power_ok(bool isok)
 {

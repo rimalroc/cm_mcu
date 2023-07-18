@@ -104,7 +104,36 @@ void setPSStatus(int i, enum ps_state theState);
 #define PS_OKS_F2_MASK_L3 0x080U
 #define PS_OKS_F2_MASK_L4 0x200U
 #define PS_OKS_F2_MASK_L5 0x800U
-#endif // REV 2
+#elif defined(DEVBOARD)
+#define N_PS_ENABLES      1
+#define N_PS_OKS          1
+#define PS_OKS_MASK       ((1U << N_PS_OKS) - 1)
+#define PS_OKS_GEN_MASK   0x00U
+#define PS_ENS_GEN_MASK   0x001U
+#define PS_ENS_F1_MASK    0x0U
+#define PS_ENS_F2_MASK    0x0U
+#define PS_OKS_F1_MASK    0x0U
+#define PS_OKS_F2_MASK    0x0U
+// OK masks for various stages of the turn-on.
+// these are indices into the oks[] array
+// L1-L6
+#define PS_OKS_F1_MASK_L1 0x000U
+#define PS_OKS_F1_MASK_L2 0x000U 
+#define PS_OKS_F1_MASK_L3 0x000U
+#define PS_OKS_F1_MASK_L4 0x000U
+#define PS_OKS_F1_MASK_L5 0x000U
+#define PS_OKS_F2_MASK_L1 0x000U
+#define PS_OKS_F2_MASK_L2 0x000U
+#define PS_OKS_F2_MASK_L3 0x000U
+#define PS_OKS_F2_MASK_L4 0x000U
+#define PS_OKS_F2_MASK_L5 0x000U
+#elif defined(DEMO)
+#warning "pins for Demo havne't been defined"
+#elif defined(PROTO)
+#warning "pins for Demo havne't been defined"
+#else 
+#error "power_ctl.h need to define a board type"
+#endif
 
 bool turn_on_ps(uint16_t);
 bool check_ps(void);

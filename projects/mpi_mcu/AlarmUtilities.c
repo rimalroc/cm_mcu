@@ -143,7 +143,7 @@ struct GenericAlarmParams_t tempAlarmTask = {
 // Voltage Alarms
 //
 ///////////////////////////////////////////////////////////
-
+/*
 // current value of the thresholds
 #define INITIAL_ALARM_VOLT_PERCENT 0.05f // +/-5% from the ADC thresholds
 static float alarmVolt = INITIAL_ALARM_VOLT_PERCENT;
@@ -310,7 +310,7 @@ struct GenericAlarmParams_t voltAlarmTask = {
     .errorlog_clearerror = &VoltClearErrorLog,
     .stack_size = 4096,
 };
-
+*/
 ///////////////////////////////////////////////////////////
 //
 // Current Alarms

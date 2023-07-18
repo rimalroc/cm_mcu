@@ -101,7 +101,7 @@ __attribute__((section(".isr_vector"))) void (*const g_pfnVectors[])(void) = {
     IntDefaultHandler, // UART1 Rx and Tx
 #endif
     IntDefaultHandler,  // SSI0 Rx and Tx
-    I2CSlave0Interrupt, // I2C0 Master and Slave
+    SMBusMasterIntHandler0, // I2C0 Master and Slave
     IntDefaultHandler,  // PWM Fault
     IntDefaultHandler,  // PWM Generator 0
     IntDefaultHandler,  // PWM Generator 1
@@ -154,8 +154,7 @@ __attribute__((section(".isr_vector"))) void (*const g_pfnVectors[])(void) = {
     IntDefaultHandler,      // SSI2 Rx and Tx
     IntDefaultHandler,      // SSI3 Rx and Tx
     IntDefaultHandler,      // UART3 Rx and Tx
-//#ifdef REV1
-#ifndef REV1
+#ifdef REV1
     UART4IntHandler, // UART4 Rx and Tx -- FRONT PANEL
 #else
     IntDefaultHandler, // UART4 Rx and Tx
@@ -205,13 +204,13 @@ __attribute__((section(".isr_vector"))) void (*const g_pfnVectors[])(void) = {
     IntDefaultHandler,      // Timer 7 subtimer A
     IntDefaultHandler,      // Timer 7 subtimer B
     SMBusMasterIntHandler6, // I2C6 Master and Slave
-    IntDefaultHandler,      // I2C7 Master and Slave
+    I2CSlave7Interrupt,      // I2C7 Master and Slave
     IntDefaultHandler,      // HIM Scan Matrix Keyboard 0
     IntDefaultHandler,      // One Wire 0
     IntDefaultHandler,      // HIM PS/2 0
     IntDefaultHandler,      // HIM LED Sequencer 0
     IntDefaultHandler,      // HIM Consumer IR 0
-    IntDefaultHandler,      // I2C8 Master and Slave
+    SMBusMasterIntHandler8,      // I2C8 Master and Slave
     IntDefaultHandler,      // I2C9 Master and Slave
     IntDefaultHandler       // GPIO Port T
 };

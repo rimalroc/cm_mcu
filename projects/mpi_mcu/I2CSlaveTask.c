@@ -37,6 +37,10 @@
 
 #if defined(REV1) || defined(REV2)
 #define SLAVE_I2C_BASE I2C0_BASE
+#elif defined(DEVBOARD)
+#define SLAVE_I2C_BASE I2C7_BASE
+#else 
+#error "I2CSlave not defined for DEMO and PROTO"
 #endif
 
 // IPMC register map documented here
@@ -56,15 +60,15 @@ static uint8_t getSlaveData(uint8_t address)
       value = testreg;
       break;
     case 0x10U:                                  // MCU temperature
-      value = (uint8_t)(getADCvalue(20) + 0.5f); // always valid
+      value = (uint8_t)(getADCvalue(ADC_CHANNEL_COUNT) + 0.5f); // always valid
       break;
     case 0x12U: // FPGA F2 temp
-      value = (uint8_t)(local_fpga_f2 >= 0 ? fpga_args.pm_values[local_fpga_f2] : 0U);
+      value = 1;//(uint8_t)(local_fpga_f2 >= 0 ? fpga_args.pm_values[local_fpga_f2] : 0U);
       if (value == 0)
         value = 0xFFU; // invalid value
       break;
     case 0x14U: // FPGA F1 temp
-      value = (uint8_t)(local_fpga_f1 >= 0 ? fpga_args.pm_values[local_fpga_f1] : 0U);
+      value = 2;//(uint8_t)(local_fpga_f1 >= 0 ? fpga_args.pm_values[local_fpga_f1] : 0U);
       if (value == 0)
         value = 0xFFU; // invalid value
       break;
@@ -72,7 +76,7 @@ static uint8_t getSlaveData(uint8_t address)
     {
       int8_t imax_temp = -55; // turn off value
       for (int i = 0; i < NFIREFLIES; ++i) {
-        int8_t v = getFFtemp(i);
+        int8_t v = i;//getFFtemp(i);
         if (v > imax_temp)
           imax_temp = v;
       }
@@ -84,6 +88,7 @@ static uint8_t getSlaveData(uint8_t address)
     case 0x18U: // hottest regulator temp
     {
       float max_temp = -99.0f;
+      /*
       for (int ps = 0; ps < dcdc_args.n_devices; ++ps) {
         for (int page = 0; page < dcdc_args.n_pages; ++page) {
           float thistemp = dcdc_args.pm_values[ps * (dcdc_args.n_commands * dcdc_args.n_pages) +
@@ -92,6 +97,7 @@ static uint8_t getSlaveData(uint8_t address)
             max_temp = thistemp;
         }
       }
+      */
       if (max_temp < 0)
         value = 0xFFU; // invalid
       else
@@ -117,8 +123,8 @@ void I2CSlaveTask(void *parameters)
 {
   TaskNotifyI2CSlave = xTaskGetCurrentTaskHandle();
 
-  local_fpga_f1 = get_f1_index();
-  local_fpga_f2 = get_f2_index();
+ // local_fpga_f1 = get_f1_index();
+ // local_fpga_f2 = get_f2_index();
 
   ROM_I2CSlaveEnable(SLAVE_I2C_BASE);
 

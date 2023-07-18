@@ -50,14 +50,24 @@ struct ADC_Info_t {
 
 // parameters for how data is organized in the fADC arrays and how the
 // sequencers are organized
+// for L0MDT we have fewer ADC, so only one sequence needed
 #define ADCs_ADC1_START             0
-#define ADCs_ADC1_FIRST_SEQ_LENGTH  8
-#define ADCs_ADC1_SECOND_SEQ_LENGTH 5
-#define ADCs_ADC1_ENTRIES           (ADCs_ADC1_FIRST_SEQ_LENGTH + ADCs_ADC1_SECOND_SEQ_LENGTH)
-#define ADCs_ADC0_START             ADCs_ADC1_ENTRIES
-#define ADCs_ADC0_ENTRIES           8
-#define ADCs_ADC0_FIRST_SEQ_LENGTH  4
-#define ADCs_ADC0_SECOND_SEQ_LENGTH 4
+#ifdef DEVBOARD
+#define ADCs_ADC1_FIRST_SEQ_LENGTH  6
+#elif defined(DEMO)
+#define ADCs_ADC1_FIRST_SEQ_LENGTH  6
+#elif defined(PROTO)
+#define ADCs_ADC1_FIRST_SEQ_LENGTH  1
+#else
+#error Need to define either Rev1 or Rev2
+#endif
+#define ADCs_ADC1_ENTRIES           ADCs_ADC1_FIRST_SEQ_LENGTH
+//#define ADCs_ADC1_SECOND_SEQ_LENGTH 5
+//#define ADCs_ADC1_ENTRIES           (ADCs_ADC1_FIRST_SEQ_LENGTH + ADCs_ADC1_SECOND_SEQ_LENGTH)
+//#define ADCs_ADC0_START             ADCs_ADC1_ENTRIES
+//#define ADCs_ADC0_ENTRIES           8
+//#define ADCs_ADC0_FIRST_SEQ_LENGTH  4
+//#define ADCs_ADC0_SECOND_SEQ_LENGTH 4
 
 // -------------------------------------------------
 //
@@ -100,6 +110,10 @@ struct ADC_Info_t ADCs[] = {
 #endif
 // clang-format on
 
+
+
+
+
 static __fp16 fADCvalues[ADC_CHANNEL_COUNT]; // ADC values in volts
 
 // read-only accessor functions for ADC names and values.
@@ -124,68 +138,40 @@ float getADCtargetValue(const int i)
 
 // there is a lot of copy-paste in the following functions,
 // but it makes it very clear what's going on here.
-static void initADC1FirstSequence(void)
-{
-
+#if defined(DEVBOARD) || defined(DEMO)
+static void initADC1FirstSequence(void){
   ROM_ADCSequenceDisable(ADC1_BASE, 0);
-
   ROM_ADCSequenceConfigure(ADC1_BASE, 0, ADC_TRIGGER_PROCESSOR, 0);
-
   ROM_ADCSequenceStepConfigure(ADC1_BASE, 0, 0, ADCs[0].channel);
   ROM_ADCSequenceStepConfigure(ADC1_BASE, 0, 1, ADCs[1].channel);
   ROM_ADCSequenceStepConfigure(ADC1_BASE, 0, 2, ADCs[2].channel);
   ROM_ADCSequenceStepConfigure(ADC1_BASE, 0, 3, ADCs[3].channel);
   ROM_ADCSequenceStepConfigure(ADC1_BASE, 0, 4, ADCs[4].channel);
-  ROM_ADCSequenceStepConfigure(ADC1_BASE, 0, 5, ADCs[5].channel);
-  ROM_ADCSequenceStepConfigure(ADC1_BASE, 0, 6, ADCs[6].channel);
-  ROM_ADCSequenceStepConfigure(ADC1_BASE, 0, 7, ADCs[7].channel | ADC_CTL_IE | ADC_CTL_END);
-
+  ROM_ADCSequenceStepConfigure(ADC1_BASE, 0, 5, ADCs[5].channel | ADC_CTL_IE | ADC_CTL_END);
   ROM_ADCSequenceEnable(ADC1_BASE, 0);
-
   ROM_ADCIntClear(ADC1_BASE, 0);
 }
-
-static void initADC1SecondSequence(void)
-{
+#elif defined(PROTO)
+#error "this must be checked and confirmed"
+static void initADC1FirstSequence(void){
   ROM_ADCSequenceDisable(ADC1_BASE, 0);
-
   ROM_ADCSequenceConfigure(ADC1_BASE, 0, ADC_TRIGGER_PROCESSOR, 0);
-  ROM_ADCSequenceStepConfigure(ADC1_BASE, 0, 0, ADCs[8].channel);
-  ROM_ADCSequenceStepConfigure(ADC1_BASE, 0, 1, ADCs[9].channel);
-  ROM_ADCSequenceStepConfigure(ADC1_BASE, 0, 2, ADCs[10].channel);
-  ROM_ADCSequenceStepConfigure(ADC1_BASE, 0, 3, ADCs[11].channel);
-  ROM_ADCSequenceStepConfigure(ADC1_BASE, 0, 4, ADCs[12].channel | ADC_CTL_IE | ADC_CTL_END);
+  ROM_ADCSequenceStepConfigure(ADC1_BASE, 0, 0, ADCs[0].channel | ADC_CTL_IE | ADC_CTL_END);
   ROM_ADCSequenceEnable(ADC1_BASE, 0);
   ROM_ADCIntClear(ADC1_BASE, 0);
 }
+#else
+#error Need to define either Rev1 or Rev2
+#endif
 
-static void initADC0FirstSequence(void)
-{
-  ROM_ADCSequenceDisable(ADC0_BASE, 1);
-  ROM_ADCSequenceConfigure(ADC0_BASE, 1, ADC_TRIGGER_PROCESSOR, 0);
-  ROM_ADCSequenceStepConfigure(ADC0_BASE, 1, 0, ADCs[13].channel);
-  ROM_ADCSequenceStepConfigure(ADC0_BASE, 1, 1, ADCs[14].channel);
-  ROM_ADCSequenceStepConfigure(ADC0_BASE, 1, 2, ADCs[15].channel);
-  ROM_ADCSequenceStepConfigure(ADC0_BASE, 1, 3, ADCs[16].channel | ADC_CTL_IE | ADC_CTL_END);
-  ROM_ADCSequenceEnable(ADC0_BASE, 1);
-  ROM_ADCIntClear(ADC0_BASE, 1);
-}
 
-static void initADC0SecondSequence(void)
-{
-  ROM_ADCSequenceDisable(ADC0_BASE, 1);
-  ROM_ADCSequenceConfigure(ADC0_BASE, 1, ADC_TRIGGER_PROCESSOR, 0);
-  ROM_ADCSequenceStepConfigure(ADC0_BASE, 1, 0, ADCs[17].channel);
-  ROM_ADCSequenceStepConfigure(ADC0_BASE, 1, 1, ADCs[18].channel);
-  ROM_ADCSequenceStepConfigure(ADC0_BASE, 1, 2, ADCs[19].channel);
-  ROM_ADCSequenceStepConfigure(ADC0_BASE, 1, 3, ADCs[20].channel | ADC_CTL_IE | ADC_CTL_END);
-  ROM_ADCSequenceEnable(ADC0_BASE, 1);
-  ROM_ADCIntClear(ADC0_BASE, 1);
-}
 
 // ADC monitoring task.
 void ADCMonitorTask(void *parameters)
 {
+  // Confirm that this is according to task.h These two should be kept
+  // manually in sync
+  configASSERT(ADC_CHANNEL_COUNT == ADCs_ADC1_ENTRIES);
   // initialize to the current tick time
   TickType_t xLastWakeTime = xTaskGetTickCount();
   uint32_t iADCvalues[ADC_CHANNEL_COUNT]; // raw adc outputs
@@ -206,56 +192,6 @@ void ADCMonitorTask(void *parameters)
     if (ulNotificationValue == 1) {
       uint32_t got = ROM_ADCSequenceDataGet(ADC1_BASE, 0, iADCvalues);
       configASSERT(got == ADCs_ADC1_FIRST_SEQ_LENGTH);
-    }
-    else {
-      // handle error here
-      configASSERT(0);
-    }
-    ROM_ADCSequenceDisable(ADC1_BASE, 0);
-
-    // ADC0,first sequence
-    initADC0FirstSequence();
-    TaskNotifyADC = xTaskGetCurrentTaskHandle();
-    ROM_ADCProcessorTrigger(ADC0_BASE, 1);
-    ulNotificationValue = ulTaskNotifyTake(pdTRUE, xMaxBlockTime);
-
-    if (ulNotificationValue == 1) {
-      uint32_t got = ROM_ADCSequenceDataGet(ADC0_BASE, 1, iADCvalues + ADCs_ADC0_START);
-      configASSERT(got == ADCs_ADC0_FIRST_SEQ_LENGTH);
-    }
-    else {
-      // handle error here
-      configASSERT(0);
-    }
-    ROM_ADCSequenceDisable(ADC0_BASE, 1);
-
-    // second sequence for ADC0
-    initADC0SecondSequence();
-    TaskNotifyADC = xTaskGetCurrentTaskHandle();
-    ROM_ADCProcessorTrigger(ADC0_BASE, 1);
-    ulNotificationValue = ulTaskNotifyTake(pdTRUE, xMaxBlockTime);
-
-    if (ulNotificationValue == 1) {
-      uint32_t got = ROM_ADCSequenceDataGet(
-          ADC0_BASE, 1, iADCvalues + ADCs_ADC0_START + ADCs_ADC0_FIRST_SEQ_LENGTH);
-      configASSERT(got == ADCs_ADC0_SECOND_SEQ_LENGTH);
-    }
-    else {
-      // handle error here
-      configASSERT(0);
-    }
-    ROM_ADCSequenceDisable(ADC0_BASE, 1);
-
-    initADC1SecondSequence();
-    TaskNotifyADC = xTaskGetCurrentTaskHandle();
-    ROM_ADCProcessorTrigger(ADC1_BASE, 0);
-
-    // Wait to be notified that the transmission is complete.
-    ulNotificationValue = ulTaskNotifyTake(pdTRUE, xMaxBlockTime);
-
-    if (ulNotificationValue == 1) {
-      uint32_t got = ROM_ADCSequenceDataGet(ADC1_BASE, 0, iADCvalues + ADCs_ADC1_FIRST_SEQ_LENGTH);
-      configASSERT(got == ADCs_ADC1_SECOND_SEQ_LENGTH);
     }
     else {
       // handle error here

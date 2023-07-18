@@ -151,13 +151,15 @@ header file. */
   errbuffer_put_raw(EBUF_CONTINUATION, (uint32_t)pc & 0xFFU)
 
 #ifdef DEBUG
+
 #define APOLLO_ASSERT(exp)    \
-  if (!(exp)) {               \
+  do{                         \
+    if (!(exp)) {             \
     taskDISABLE_INTERRUPTS(); \
     APOLLO_ASSERT_RECORD();   \
-    for (;;)                  \
-      ;                       \
-  }
+    for (;;){;}               \
+  }} while (0)
+
 #else
 #define APOLLO_ASSERT(exp)    \
   if (!(exp)) {               \

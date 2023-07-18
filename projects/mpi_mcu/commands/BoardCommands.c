@@ -112,7 +112,7 @@ BaseType_t gpio_ctl(int argc, char **argv, char *m)
   }
   /// X-Macro start
   // find the corresponding pins and ports
-#define X(NAME, PPIN, PPORT, LOCALPIN, INPUT)        \
+#define X(NAME, PPIN, PPORT, LOCALPIN, INPUT, TYPE)        \
   if (strncmp(#NAME, argv[2], strlen(#NAME)) == 0) { \
     port = GPIO_PORT##PPORT##_BASE;                  \
     pin = GPIO_PIN_##LOCALPIN;                       \
@@ -128,6 +128,9 @@ BaseType_t gpio_ctl(int argc, char **argv, char *m)
 #endif
   // X-Macro end
   // ensure we found a match
+//  #ifdef DEBUG
+  snprintf(m, SCRATCH_SIZE, "%s DEBUG: got port %x and pin %x\r\n", argv[0], port, pin);
+//  #endif
   if (pin == -1 || port == -1) {
     snprintf(m, SCRATCH_SIZE, "%s: couldn't find pin %s\r\n", argv[0], argv[2]);
     return pdFALSE;

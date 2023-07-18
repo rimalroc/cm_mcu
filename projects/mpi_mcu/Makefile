@@ -103,15 +103,8 @@ ${COMPILER}:
 ${COMPILER}/mpi_mcu.axf: ${COMPILER}/mpi_mcu.o
 ifdef DEVBOARD
 ${COMPILER}/mpi_mcu.axf: ${COMPILER}/pinout_devboard.o
-else
-ifdef REV1
-${COMPILER}/mpi_mcu.axf: ${COMPILER}/pinout_rev1.o
 endif
-ifdef REV2
-${COMPILER}/mpi_mcu.axf: ${COMPILER}/pinout_rev2.o
-endif 
-endif
-${COMPILER}/mpi_mcu.axf: ${COMPILER}/pinsel_MPI.o
+${COMPILER}/mpi_mcu.axf: ${COMPILER}/pinsel.o
 ${COMPILER}/mpi_mcu.axf: ${COMPILER}/i2c_reg.o
 ${COMPILER}/mpi_mcu.axf: ${COMPILER}/LocalUart.o
 ${COMPILER}/mpi_mcu.axf: ${COMPILER}/utils.o
@@ -138,7 +131,7 @@ ${COMPILER}/mpi_mcu.axf: ${COMPILER}/ZynqMonTask.o
 ${COMPILER}/mpi_mcu.axf: ${COMPILER}/InterruptHandlers.o
 ${COMPILER}/mpi_mcu.axf: ${COMPILER}/InitTask.o
 ${COMPILER}/mpi_mcu.axf: ${COMPILER}/WatchdogTask.o
-${COMPILER}/mpi_mcu.axf: ${COMPILER}/LocalTasks.o
+#${COMPILER}/mpi_mcu.axf: ${COMPILER}/LocalTasks.o
 ${COMPILER}/mpi_mcu.axf: ${COMPILER}/BoardCommands.o
 ${COMPILER}/mpi_mcu.axf: ${COMPILER}/SoftwareCommands.o
 ${COMPILER}/mpi_mcu.axf: ${COMPILER}/BufferCommands.o

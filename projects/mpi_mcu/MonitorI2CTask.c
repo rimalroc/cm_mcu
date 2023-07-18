@@ -99,31 +99,7 @@ void MonitorI2CTask(void *parameters)
       if (ps == args->n_devices - 1 && getPowerControlState() != POWER_ON) { // avoid continues to infinite loops due to multi-threading when pwr is not on
         break;
       }
-      if (!IsCLK) {                           // Fireflies need to be checked if the links are connected or not
-        if (args->i2c_dev == I2C_DEVICE_F1) { // FPGA #1
-#ifdef REV1
-          int NFIREFLIES_IT_F1_P1 = NFIREFLIES_IT_F1 - 2;
-          if (!isEnabledFF((IsFFDAQ * (ps + NFIREFLIES_IT_F1_P1)) + (IsFF12 * (ps < NFIREFLIES_IT_F1 - 3) * (ps)) + (IsFF12 * (ps > NFIREFLIES_IT_F1 - 3) * (ps + NFIREFLIES_DAQ_F1)))) // skip the FF if it's not enabled via the FF config
-            continue;
-#elif defined(REV2)
-          if (!isEnabledFF((IsFFDAQ * (ps + NFIREFLIES_IT_F1)) + (IsFF12 * (ps)))) // skip the FF if it's not enabled via the FF config
-            continue;
-#else
-#error "Define either Rev1 or Rev2"
-#endif
-        }
-        if (args->i2c_dev == I2C_DEVICE_F2) { // FPGA #2
-#ifdef REV1
-          if (!isEnabledFF(NFIREFLIES_F1 + (IsFFDAQ * (ps)) + (IsFF12 * (ps + NFIREFLIES_DAQ_F2)))) // skip the FF if it's not enabled via the FF config
-            continue;
-#elif defined(REV2)
-          if (!isEnabledFF(NFIREFLIES_F1 + (IsFFDAQ * (ps + NFIREFLIES_IT_F2)) + (IsFF12 * (ps)))) // skip the FF if it's not enabled via the FF config
-            continue;
-#else
-#error "Define either Rev1 or Rev2"
-#endif
-        }
-      }
+
       log_debug(LOG_MONI2C, "%s: powercheck\r\n", args->name);
 
       if (getPowerControlState() != POWER_ON) {

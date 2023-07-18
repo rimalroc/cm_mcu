@@ -23,7 +23,14 @@
 // This array helps us simplify the use of different I2C devices in the board.
 const uint32_t I2C_BASE[] = {I2C0_BASE, I2C1_BASE, I2C2_BASE, I2C3_BASE, I2C4_BASE,
                              I2C5_BASE, I2C6_BASE, I2C7_BASE, I2C8_BASE, I2C9_BASE};
+const uint32_t SYSCTL_PERIPH_I2C[] = 
+                { SYSCTL_PERIPH_I2C0, SYSCTL_PERIPH_I2C1
+                , SYSCTL_PERIPH_I2C2, SYSCTL_PERIPH_I2C3
+                , SYSCTL_PERIPH_I2C4, SYSCTL_PERIPH_I2C5
+                , SYSCTL_PERIPH_I2C6, SYSCTL_PERIPH_I2C7
+                , SYSCTL_PERIPH_I2C8, SYSCTL_PERIPH_I2C9 };
 
+#if defined(REV1) || defined(REV2)
 // initialize I2C module 0
 // Slightly modified version of TI's example code
 void initI2C0(const uint32_t sysclockfreq)
@@ -310,4 +317,70 @@ void initI2C6(const uint32_t sysclockfreq)
   ;
   write_gpio_pin(_FPGA_I2C_RESET, 0x1); // active low
 }
+#endif
+
+#endif //defined(REV1) || defined(REV2)
+// L0MDT specific
+
+
+
+
+#if defined(DEVBOARD) || defined (DEMO) || defined (PROTO)
+void initI2C(int I2C_number, const uint32_t sysclockfreq)
+{
+  // enable I2C module 3
+  MAP_SysCtlPeripheralEnable(SYSCTL_PERIPH_I2C[I2C_number]);
+  //
+  // Wait for the I2C6 module to be ready.
+  //
+  while (!MAP_SysCtlPeripheralReady(SYSCTL_PERIPH_I2C[I2C_number])){
+  }
+
+  // Stop the Clock, Reset and Enable I2C Module
+  // in Master Function
+  //
+  MAP_SysCtlPeripheralDisable(SYSCTL_PERIPH_I2C[I2C_number]);
+  MAP_SysCtlPeripheralReset(SYSCTL_PERIPH_I2C[I2C_number]);
+  MAP_SysCtlPeripheralEnable(SYSCTL_PERIPH_I2C[I2C_number]);
+
+  while (!MAP_SysCtlPeripheralReady(SYSCTL_PERIPH_I2C[I2C_number])){}
+    
+
+  // Enable and initialize the I2C master module.  Use the system clock for
+  // the I2C6 module.  The last parameter sets the I2C data transfer rate.
+  // If false the data rate is set to 100kbps and if true the data rate will
+  // be set to 400kbps.
+  MAP_I2CMasterInitExpClk(I2C_BASE[I2C_number], sysclockfreq, false);
+  while (!MAP_SysCtlPeripheralReady(SYSCTL_PERIPH_I2C[I2C_number])){}
+    
+
+  // clear I2C FIFOs
+  // HWREG(I2C6_BASE + I2C_0_FIFOCTL) = 80008000;
+  MAP_I2CRxFIFOFlush(I2C_BASE[I2C_number]);
+  MAP_I2CTxFIFOFlush(I2C_BASE[I2C_number]);
+
+
+}
+#endif
+
+
+#if defined(DEVBOARD) || defined (DEMO)
+void initI2C_all(const uint32_t sysclockfreq)
+{
+  initI2C(0,sysclockfreq);
+  initI2C(1,sysclockfreq);
+  initI2C(2,sysclockfreq);
+  initI2C(3,sysclockfreq);
+  initI2C(4,sysclockfreq);
+  initI2C(5,sysclockfreq);
+  initI2C(6,sysclockfreq);
+  initI2C(7,sysclockfreq);
+  initI2C(8,sysclockfreq);
+  write_gpio_pin(I2C_MUX_nRST, 0x0); // active low
+  MAP_SysCtlDelay(sysclockfreq / 10);
+  ;
+  write_gpio_pin(I2C_MUX_nRST, 0x1); // active low
+}
+#elif defined(PROTO)
+#error "I2C functions for ptototype has not yet been implemented"
 #endif

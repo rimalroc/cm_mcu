@@ -22,6 +22,11 @@
 #include "common/softuart.h"
 #elif defined(REV2)
 #include "driverlib/uart.h"
+#elif defined(DEVBOARD)
+#include "driverlib/uart.h"
+#define ZYNQMON_TEST_MODE
+#else
+#error missing also here
 #endif
 
 #include "Tasks.h"
@@ -202,6 +207,11 @@ void ZMUartCharPut(unsigned char c)
 void ZMUartCharPut(unsigned char c)
 {
   ROM_UARTCharPut(UART4_BASE, c);
+}
+#elif defined(DEVBOARD)
+void ZMUartCharPut(unsigned char c)
+{
+  ROM_UARTCharPut(UART5_BASE, c);
 }
 #else
 #error "Unknown board revision"
@@ -415,6 +425,14 @@ void zm_fill_structs(void)
   zm_set_fpga(&zynqmon_data[137], 150);
 }
 #define ZMON_VALID_ENTRIES 145
+#elif defined (DEVBOARD)
+
+void zm_fill_structs(void)
+{
+}
+#define ZMON_VALID_ENTRIES 145
+#else
+#error "ZynqmonTask not defined any board"
 #endif
 
 void zm_send_data(struct zynqmon_data_t data[])

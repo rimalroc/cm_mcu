@@ -95,19 +95,20 @@ PinoutSet(void)
 	HWREG(GPIO_PORTD_BASE+GPIO_O_CR)   |= GPIO_PIN_7;
 	HWREG(GPIO_PORTD_BASE+GPIO_O_LOCK) = 0x0;
 
-    //
-    // Configure the GPIO Pin Mux for PM7
-	// for GPIO_PM7
-    //
-//	MAP_GPIOPinTypeGPIOInput(GPIO_PORTM_BASE, GPIO_PIN_7);
-//	MAP_GPIOPadConfigSet(GPIO_PORTM_BASE, GPIO_PIN_7, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD_WPU);
+
 
 // gpios
-
-#define X(NAME, PPIN, PPORT, LOCALPIN, INPUT) \
-    MAP_GPIOPinTypeGPIOInput(GPIO_PORT##PPORT##_BASE, GPIO_PIN_##LOCALPIN);
-
 #ifdef DEVBOARD
+#define X(NAME, PPIN, PPORT, LOCALPIN, INPUT, TYPE) \
+	if (INPUT){ \
+    	MAP_GPIOPinTypeGPIOInput(GPIO_PORT##PPORT##_BASE, GPIO_PIN_##LOCALPIN); \
+		MAP_GPIOPadConfigSet(GPIO_PORT##PPORT##_BASE, GPIO_PIN_##LOCALPIN, GPIO_STRENGTH_2MA, TYPE);\
+	} \
+	else	\
+		MAP_GPIOPinTypeGPIOOutput(GPIO_PORT##PPORT##_BASE, GPIO_PIN_##LOCALPIN);
+
+
+
 #include "common/gpio_pins_devboard.def"
 #elif defined(DEMO)
 #warning "pins for Demo havne't been defined"
@@ -242,6 +243,21 @@ PinoutSet(void)
     //
 	MAP_GPIOPinConfigure(GPIO_PA3_U4TX);
 	MAP_GPIOPinTypeUART(GPIO_PORTA_BASE, GPIO_PIN_3);
+
+	// UART for monitoring to zynq
+	//
+    // Configure the GPIO Pin Mux for PC6
+	// for U5RX
+    //
+	MAP_GPIOPinConfigure(GPIO_PC6_U5RX);
+	MAP_GPIOPinTypeUART(GPIO_PORTC_BASE, GPIO_PIN_6);
+
+    //
+    // Configure the GPIO Pin Mux for PC7
+	// for U5TX
+    //
+	MAP_GPIOPinConfigure(GPIO_PC7_U5TX);
+	MAP_GPIOPinTypeUART(GPIO_PORTC_BASE, GPIO_PIN_7);
 #endif
 
 }

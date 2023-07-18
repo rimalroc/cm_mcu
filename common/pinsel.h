@@ -85,7 +85,19 @@ enum pins {
 #define isFPGAF1_PRESENT() (read_gpio_pin(_F1_INSTALLED) == 0)
 #define isFPGAF2_PRESENT() (read_gpio_pin(_F2_INSTALLED) == 0)
 
+#elif defined(DEVBOARD) 
+
+#define X(name, pin, port, localpin, input, type ) \
+  name = pin,
+enum pins {
+#include "gpio_pins_devboard.def"
+};
+#elif defined(DEMO)
+#warning "pins for Demo havne't been defined"
+#elif defined(PROTO)
+#warning "pins for Demo havne't been defined"
 #else
+
 #error "Unknown board revision"
 #endif
 
