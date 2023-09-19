@@ -7,5 +7,74 @@
    // Blade control, SM_PWR_ENA and CM_READY
    X(BLADE_POWER_OK, 7,    N, 2, false, GPIO_PIN_TYPE_STD)
    X(BLADE_POWER_EN, 8,    N, 3, true, GPIO_PIN_TYPE_STD_WPD)
-      X(I2C_MUX_nRST, 52, Q, 6, false, GPIO_PIN_TYPE_STD)
+   X(I2C_MUX_nRST, 52, Q, 6, false, GPIO_PIN_TYPE_STD)
+   // Power Demo
+   // Power -> Clock (first to power up, last to power down)
+   X(CLK_PM_CTRL0,   9,    H, 1, false, GPIO_PIN_TYPE_STD)
+   // Power -> KU15P
+   X(KUP_PM_CTRL0,   10,   H, 2, false, GPIO_PIN_TYPE_STD)
+   X(KUP_CORE_RUN,      11,   F, 3, false, GPIO_PIN_TYPE_STD)
+   X(KUP_P3V3_IO_RUN,   12,   H, 0, false, GPIO_PIN_TYPE_STD)
+   X(KUP_DDR4_TERM_EN,  13,   F, 4, false, GPIO_PIN_TYPE_STD)
+   // Power -> ZU11EG
+   X(ZUP_PM_CTRL0,   14,   H, 3, false, GPIO_PIN_TYPE_STD)
+   X(ZUP_CORE_RUN,      15,   D, 6, false, GPIO_PIN_TYPE_STD)
+   X(ZUP_PS_DDR4_TERM_EN,  16, D, 7, false, GPIO_PIN_TYPE_STD)
+   X(ZUP_PL_DDR4_TERM_EN,  17, F, 0, false, GPIO_PIN_TYPE_STD)
+   // Power -> FireFly
+   //X(FIREFY_P1V8_RUN,      18, F, 1, false, GPIO_PIN_TYPE_STD)
+   X(FIREFY_P3V3_RUN,      19, F, 2, false, GPIO_PIN_TYPE_STD)
+   // Command Module status LEDs.
+   X(CLK_DOMAIN_PG,  20, Q, 0, false, GPIO_PIN_TYPE_STD)
+   X(KUP_DOMAIN_PG,  21, N, 4, false, GPIO_PIN_TYPE_STD)
+   X(ZUP_DOMAIN_PG,  22, N, 5, false, GPIO_PIN_TYPE_STD)
+   X(TEMP_ERROR,     23, Q, 1, false, GPIO_PIN_TYPE_STD)
+   // MCU user LEDs.
+   X(MCU_USER_LED0, 24, M, 0, false, GPIO_PIN_TYPE_STD)
+   X(MCU_USER_LED1, 25, M, 1, false, GPIO_PIN_TYPE_STD)
+   X(MCU_USER_LED2, 26, M, 2, false, GPIO_PIN_TYPE_STD)
+   X(MCU_USER_LED3, 27, M, 3, false, GPIO_PIN_TYPE_STD)
+   X(MCU_USER_LED4, 28, M, 4, false, GPIO_PIN_TYPE_STD)
+   X(MCU_USER_LED5, 29, M, 5, false, GPIO_PIN_TYPE_STD)
+   X(MCU_USER_LED6, 30, M, 6, false, GPIO_PIN_TYPE_STD)
+   X(MCU_USER_LED7, 31, M, 7, false, GPIO_PIN_TYPE_STD)
+   // High speed signal multiplexer selection.
+   X(B2B_MUX1_SEL,   32, A, 2, false, GPIO_PIN_TYPE_STD)
+   X(B2B_MUX2_SEL,   33, A, 4, false, GPIO_PIN_TYPE_STD)
+   X(LTTC_MUX1_SEL,  34, C, 4, false, GPIO_PIN_TYPE_STD)
+   // High speed signal multiplexer power down.
+   X(B2B_MUX1_PD,    35, A, 3, false, GPIO_PIN_TYPE_OD)
+   X(B2B_MUX2_PD,    36, A, 5, false, GPIO_PIN_TYPE_OD)
+   X(LTTC_MUX1_PD,   37, C, 5, false, GPIO_PIN_TYPE_OD)
+   // Clock multiplexer selection.
+   X(AD_CLK2_KUP_SEL,   38, E, 0, false, GPIO_PIN_TYPE_STD)
+   X(AD_CLK3_KUP_SEL,   39, E, 1, false, GPIO_PIN_TYPE_STD)
+   X(AD_CLK4_KUP_SEL,   40, E, 2, false, GPIO_PIN_TYPE_STD)
+   X(AD_CLK5_ZUP_SEL,   41, N, 0, false, GPIO_PIN_TYPE_STD)
+   X(CLK_LHC_FPGA_SEL,  42, N, 1, false, GPIO_PIN_TYPE_STD)
+   // Control/status of the KU15P.
+   X(KUP_PROG_B_3V3, 43, K, 6, false, GPIO_PIN_TYPE_OD)
+   X(KUP_INIT_B_3V3, 44, K, 5, false, GPIO_PIN_TYPE_OD)
+   X(KUP_DONE_3V3,   45, K, 7, true, GPIO_PIN_TYPE_STD)
+   // Control/status of the ZU11EG.
+   X(ZUP_PS_PROG_B,     46, P, 1, false, GPIO_PIN_TYPE_OD)
+   X(ZUP_PS_INIT_B,     47, P, 0, false, GPIO_PIN_TYPE_OD)
+   X(ZUP_PS_DONE,       48, P, 2, true, GPIO_PIN_TYPE_STD)
+   X(ZUP_PS_nPOR,       49, P, 3, false, GPIO_PIN_TYPE_OD)
+   X(ZUP_PS_ERR_STATUS, 50, P, 4, true, GPIO_PIN_TYPE_STD)
+   X(ZUP_PS_ERR_OUT,    51, P, 5, true, GPIO_PIN_TYPE_STD)
+   // Reset for multiplexers and I2C port expanders.
+   X(I2C_MUX_nRST, 52, Q, 6, false, GPIO_PIN_TYPE_STD)
+   X(MCU_PEx_nRST, 53, Q, 3, false, GPIO_PIN_TYPE_STD)
+   // Interrupt of I2C port expanders.
+   X(MCU_PEx_nINT, 54, Q, 2, true, GPIO_PIN_TYPE_STD)
+   // Spare signals routed to KU15P / ZU11EG.
+   X(MCU_2_KUP_SE0, 55, L, 4, false, GPIO_PIN_TYPE_STD)
+   X(MCU_2_KUP_SE1, 56, L, 5, false, GPIO_PIN_TYPE_STD)
+   X(MCU_2_KUP_SE2, 57, L, 6, false, GPIO_PIN_TYPE_STD)
+   X(MCU_2_KUP_SE3, 58, L, 7, false, GPIO_PIN_TYPE_STD)
+   X(MCU_2_ZUP_SE0, 59, L, 0, false, GPIO_PIN_TYPE_STD)
+   X(MCU_2_ZUP_SE1, 60, L, 1, false, GPIO_PIN_TYPE_STD)
+   X(MCU_2_ZUP_SE2, 61, L, 2, false, GPIO_PIN_TYPE_STD)
+   X(MCU_2_ZUP_SE3, 62, L, 3, false, GPIO_PIN_TYPE_STD)
 #undef X

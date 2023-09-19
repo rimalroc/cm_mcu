@@ -61,6 +61,8 @@ extern "C" {
 //*****************************************************************************
 extern void PinoutSet(void);
 
+extern void GpioInit_All(void);
+
 //*****************************************************************************
 //
 // Mark the end of the C bindings section for C++ compilers.

@@ -13,6 +13,14 @@ struct gpio_pin_t {
   int priority;
 };
 
+// data structures to hold GPIO PIN information
+struct gpio_power_pin_t {
+  uint8_t pin_number;
+  char *name;
+  int up_priority;
+  int down_priority;
+};
+
 #if defined(REV1)
 #define TM4C_TO_VU7P_0              5   // port, local_pin = Q 0
 #define TM4C_FROM_VU7P_0            6   // port, local_pin = Q 1

@@ -4,7 +4,7 @@
    // Reserved
    X(CLK_PM_CTRL0,   9,    H, 1, false)
    X(KUP_PM_CTRL0,   10,   H, 2, false)
-   X(ZUP_PM_CTRL0,   11,   H, 2, false)
+   X(ZUP_PM_CTRL0,   11,   H, 3, false)
    // Power Control
    X(KUP_CORE_RUN,      12,   F, 3, false)
    X(KUP_P3V3_IO_RUN,   13,   H, 0, false)
