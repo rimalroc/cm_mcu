@@ -67,11 +67,11 @@ enum power_system_state {
   POWER_INIT,
   POWER_DOWN,
   POWER_OFF,
-  POWER_L1ON,
-  POWER_L2ON,
-  POWER_L3ON,
-  POWER_L4ON,
-  POWER_L5ON,
+  POWER_CLOCK,
+  POWER_KU,
+  POWER_ZU,
+  POWER_VU,
+  POWER_FIREFLY,
   POWER_ON,
 };
 enum power_system_state getPowerControlState(void);

@@ -101,7 +101,6 @@ void SystemInit(void)
 
   // initialize all pins, using file setup by TI PINMUX tool
   PinoutSet();
-
 }
 #ifdef DEVBOARD
 void SystemInit_MPI(void)
@@ -115,6 +114,7 @@ void SystemInit_MPI(void)
                                              SYSCTL_CFG_VCO_480), 120000000);
 
   PinoutSet();
+  GpioInit_All();
 }
 #endif
 // This set of functions partially contains calls that require
@@ -347,10 +347,10 @@ int main(void)
     fpga_args.pm_values[i] = -999.f;
 */
   // start the tasks here
-/*
+
   xTaskCreate(PowerSupplyTask, "POW", 2 * configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 5, NULL);
-  xTaskCreate(LedTask, "LED", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 2, NULL);
-  */
+//  xTaskCreate(LedTask, "LED", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 2, NULL);
+
   xTaskCreate(vCommandLineTask, "CLIZY", 512, &cli_uart, tskIDLE_PRIORITY + 3, NULL);
 #ifdef REV1
 //  xTaskCreate(vCommandLineTask, "CLIFP", 512, &cli_uart4, tskIDLE_PRIORITY + 4, NULL);

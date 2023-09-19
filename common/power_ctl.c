@@ -108,14 +108,41 @@ struct gpio_pin_t oks[N_PS_OKS] = {
     //{ PG_4V0, "PG_4V0", 6},  // enable_3v8(true/false) won't change PG_4V0. Only within 10s after 4.0V off, PG_4V0 can be 0x0.
 };
 #elif defined(DEVBOARD)
-static const struct gpio_pin_t enables[] = {
-    {  BLADE_POWER_OK, "BLADE_POWER_EN", 1},
 
+static const struct gpio_pin_t enables[] = {
+    { BLADE_POWER_OK, "BLADE_POWER_EN", 1},
+    { CLK_PM_CTRL0, "CLK_PM_CTRL0", 1},
+
+    { KUP_CORE_RUN,     "KUP_CORE_RUN", 2},
+    { KUP_DDR4_TERM_EN, "KUP_DDR4_TERM_EN", 2},
+    { KUP_PM_CTRL0,     "KUP_PM_CTRL0", 2},
+    { KUP_P3V3_IO_RUN,  "KUP_P3V3_IO_RUN", 2},
+
+    { ZUP_CORE_RUN, "ZUP_CORE_RUN", 3},
+    { ZUP_PS_DDR4_TERM_EN, "ZUP_PS_DDR4_TERM_EN", 3},
+    { ZUP_PL_DDR4_TERM_EN, "ZUP_PL_DDR4_TERM_EN", 3},
+    { ZUP_PM_CTRL0, "ZUP_PM_CTRL0", 3},
+
+    { FIREFY_P3V3_RUN, "FIREFY_P3V3_RUN", 4},
+    
 };
+// oks should be a Power Good indicator
+// for the moment just check the status of the ctrl pin
 const
 struct gpio_pin_t oks[N_PS_OKS] = {
-    { BLADE_POWER_OK, "BLADE_POWER_OK", 1},
-    //{ PG_4V0, "PG_4V0", 6},  // enable_3v8(true/false) won't change PG_4V0. Only within 10s after 4.0V off, PG_4V0 can be 0x0.
+    { CLK_PM_CTRL0, "CLK_PM_CTRL0", 1},
+
+    { KUP_CORE_RUN,     "KUP_CORE_RUN", 2},
+    { KUP_DDR4_TERM_EN, "KUP_DDR4_TERM_EN", 2},
+    { KUP_PM_CTRL0,     "KUP_PM_CTRL0", 2},
+    { KUP_P3V3_IO_RUN,  "KUP_P3V3_IO_RUN", 2},
+
+    { ZUP_CORE_RUN, "ZUP_CORE_RUN", 3},
+    { ZUP_PS_DDR4_TERM_EN, "ZUP_PS_DDR4_TERM_EN", 3},
+    { ZUP_PL_DDR4_TERM_EN, "ZUP_PL_DDR4_TERM_EN", 3},
+    { ZUP_PM_CTRL0, "ZUP_PM_CTRL0", 3},
+
+    { FIREFY_P3V3_RUN, "FIREFY_P3V3_RUN", 4},
 };
 #elif defined(DEMO)
 #warning "pins for Demo havne't been defined"
@@ -161,8 +188,8 @@ bool disable_ps(void)
 
   // disable in reverse order
   for (int prio = PS_NUM_PRIORITIES; prio > 0; --prio) {
-    // disable the supplies at the relevant priority
-    for (int e = 0; e < N_PS_ENABLES; ++e) {
+    // disable the supplies at the relevant priority and reverse order
+    for (int e = N_PS_ENABLES; e > 0 ; --e) {
       if (enables[e].priority == prio) {
         write_gpio_pin(enables[e].pin_number, 0x0);
       }
@@ -196,6 +223,8 @@ bool disable_ps(void)
 // Return immediately if BLADE_POWER_EN is not asserted by the SM.
 // Which supplies to enable is based on the ps_en_mask (passed in),
 // which references entries in the enables[] array.
+// the order to power on is defined by priority column in enables
+//   start with priotity 1 and end with priority PS_NUM_PRIORITIES
 bool turn_on_ps(uint16_t ps_en_mask)
 {
   #ifndef DEVBOARD
@@ -223,37 +252,18 @@ bool turn_on_ps(uint16_t ps_en_mask)
   return true;
 }
 
-#if defined(REV1) || defined (REV2)
 // Enable supply at some priority. Also send in vu and ku enable.
-void turn_on_ps_at_prio(bool f2_enable, bool f1_enable, int prio)
+void turn_on_ps_at_prio(int prio)
 {
-  // in the special case where neither f1 or f2 are enabled (no FPGAs),
-  // enable both of them (commissioning of new PCB
-  if (!f1_enable && !f2_enable) {
-    f1_enable = true;
-    f2_enable = true;
-  }
   // loop over the enables
   for (int e = 0; e < N_PS_ENABLES; ++e) {
     // if this enable matches the requested priority
     if (enables[e].priority == prio) {
-      // check if this supply is to be enabled
-      // current spot in mask
-      uint16_t currmask = (1U << e);
-      // should this supply be enabled?
-      // three cases -- either it's a general supply (1.8 and 3.3V),
-      // or it's a VU supply and the enable is set, or it's a KU supply
-      // and the enable is set.
-      bool enableSupply = (currmask & PS_ENS_GEN_MASK) ||               // general
-                          ((currmask & PS_ENS_F2_MASK) && f2_enable) || // f2
-                          ((currmask & PS_ENS_F1_MASK) && f1_enable);   // f1
-      if (enableSupply) {
-        write_gpio_pin(enables[e].pin_number, 0x1);
-      }
+      // no checks to be done
+      write_gpio_pin(enables[e].pin_number, 0x1);
     }
   }
 }
-#endif
 
 void blade_power_ok(bool isok)
 {

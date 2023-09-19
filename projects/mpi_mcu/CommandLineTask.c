@@ -239,11 +239,11 @@ static struct command_t commands[] = {
 
 //    {"led", led_ctl, "Manipulate red LED.\r\n", 1},
 //    {"mem", mem_ctl, "Size of heap.\r\n", 0},
-//    { "pwr",
-//        power_ctl,
-//        "args: (on|off|status|clearfail)\r\nTurn on or off all power, get status or clear "
-//        "failures.\r\n",
-//        1 },
+   { "pwr",
+       power_ctl,
+       "args: (on|off|status|clearfail)\r\nTurn on or off all power, get status or clear "
+       "failures.\r\n",
+       1 },
 //    {"psmon", psmon_ctl, "Displays a table showing the state of power supplies.\r\n", 1},
     {"restart_mcu", restart_mcu, "Restart the microcontroller\r\n", 0},
 //    {"semaphore", sem_ctl, "args: (none)|<i2cdev 1-6> <take|release>\r\nTake or release a semaphore\r\n", -1},

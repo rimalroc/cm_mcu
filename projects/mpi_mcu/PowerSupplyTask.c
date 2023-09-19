@@ -48,7 +48,7 @@ static uint16_t check_ps_oks(void)
   }
   return status;
 }
-
+/*
 static uint16_t getPSFailMask(void)
 {
   // PS ignore mask stored in on-board EEPROM
@@ -73,7 +73,7 @@ static uint16_t getPSFailMask(void)
   #endif
   return (uint16_t)(0xFFFFU & ps_ignore_mask); // 16 bit
 }
-
+*/
 void printfail(uint16_t failed_mask, uint16_t supply_ok_mask, uint16_t supply_bitset)
 {
   log_error(LOG_PWRCTL, "psfail: fail, supply_mask, bitset =  %x,%x,%x\r\n", failed_mask,
@@ -85,11 +85,11 @@ static const char *const power_system_state_names[] = {
     "INIT",
     "DOWN",
     "OFF",
-    "L1ON",
-    "L2ON",
-    "L3ON",
-    "L4ON",
-    "L5ON",
+    "CLKON",
+    "KUON",
+    "ZUON",
+    "VUON",
+    "FFON",
     "ON",
 };
 
@@ -126,30 +126,30 @@ void PowerSupplyTask(void *parameters)
   // setting the enables both to true for debugging blank bo
 
   // exceptions are stored in the internal EEPROM -- the IGNORE mask.
-  ignore_mask = getPSFailMask();
+//  ignore_mask = getPSFailMask();
   // doing nothing with ignored mask, might be helpful in future
 //  if (ignore_mask) {  }
 
-  bool f1_enable = true; //isFPGAF1_PRESENT();
-  bool f2_enable = true; //isFPGAF2_PRESENT();
-    uint16_t supply_ok_mask = PS_OKS_GEN_MASK;
-    uint16_t supply_ok_mask_L1 = 0U, supply_ok_mask_L2 = 0U, supply_ok_mask_L4 = 0U,
-           supply_ok_mask_L5 = 0U;
 
-  if (f1_enable) {
-    supply_ok_mask |= PS_OKS_F1_MASK;
-    supply_ok_mask_L1 = PS_OKS_F1_MASK_L1;
-    supply_ok_mask_L2 = supply_ok_mask_L1 | PS_OKS_F1_MASK_L2;
-    supply_ok_mask_L4 = supply_ok_mask_L2 | PS_OKS_F1_MASK_L4;
-    supply_ok_mask_L5 = supply_ok_mask_L4 | PS_OKS_F1_MASK_L5;
-  }
-  if (f2_enable) {
-    supply_ok_mask |= PS_OKS_F2_MASK;
-    supply_ok_mask_L1 |= PS_OKS_F2_MASK_L1;
-    supply_ok_mask_L2 |= supply_ok_mask_L1 | PS_OKS_F2_MASK_L2;
-    supply_ok_mask_L4 |= supply_ok_mask_L2 | PS_OKS_F2_MASK_L4;
-    supply_ok_mask_L5 |= supply_ok_mask_L4 | PS_OKS_F2_MASK_L5;
-  }
+  uint16_t supply_ok_mask = PS_OKS_GEN_MASK;
+  uint16_t supply_ok_mask_clock = 0U, supply_ok_mask_ku = 0U, 
+          supply_ok_mask_zu = 0U, supply_ok_mask_vu = 0U,
+          supply_ok_mask_ff = 0U;
+
+
+
+  supply_ok_mask_clock = PS_OKS_MASK_CLOCK;
+  #if defined(PROTO)
+    supply_ok_mask |= PS_OKS_PROTO_MASK;
+    supply_ok_mask_vu = supply_ok_mask_clock | PS_OKS_MASK_VU;
+    supply_ok_mask_ff = supply_ok_mask_vu | PS_OKS_MASK_FF;
+  #else
+    supply_ok_mask |= PS_OKS_DEMO_MASK;
+    supply_ok_mask_ku = supply_ok_mask_clock | PS_OKS_MASK_KU;
+    supply_ok_mask_zu = supply_ok_mask_ku | PS_OKS_MASK_ZU;
+    supply_ok_mask_ff = supply_ok_mask_zu | PS_OKS_MASK_FF;
+  #endif
+
 // Do we need to initiazile some power supply?
 
   bool power_supply_alarm = false;
@@ -185,8 +185,10 @@ void PowerSupplyTask(void *parameters)
       }
     }
     #ifdef DEVBOARD
-    bool ignorefail = true; // HACK THIS NEEDS TO BE FIXED TODO FIXME
+    bool ignorefail = false; // HACK THIS NEEDS TO BE FIXED TODO FIXME
     #else
+    // the OKS needs to be read using the gpio expander.
+    // need to decide if a task will read them, or will be read on demand.
     #error "need to review the sequence for DEMO and PROTO"
     bool ignorefail = false; // HACK THIS NEEDS TO BE FIXED TODO FIXME
     #endif
@@ -249,77 +251,87 @@ void PowerSupplyTask(void *parameters)
         if (blade_power_enable && !cli_powerdown_request && !external_alarm &&
             !power_supply_alarm) {
           log_info(LOG_PWRCTL, "power-up requested\r\n");
-          turn_on_ps_at_prio(f2_enable, f1_enable, 1);
+          turn_on_ps_at_prio(1);
           errbuffer_put(EBUF_POWER_ON, 0);
-          nextState = POWER_L1ON;
+          nextState = POWER_CLOCK;
         }
         else {
           nextState = POWER_OFF;
         }
         break;
       }
-      case POWER_L1ON: {
-        if (((supply_bitset & supply_ok_mask_L1) != supply_ok_mask_L1) && !ignorefail) {
-          failed_mask = (~supply_bitset) & supply_ok_mask_L1;
-          printfail(failed_mask, supply_ok_mask_L1, supply_bitset);
+      case POWER_CLOCK: {
+        if (((supply_bitset & supply_ok_mask_clock) != supply_ok_mask_clock) && !ignorefail) {
+          failed_mask = (~supply_bitset) & supply_ok_mask_clock;
+          printfail(failed_mask, supply_ok_mask_clock, supply_bitset);
           errbuffer_power_fail(failed_mask);
           disable_ps();
           power_supply_alarm = true;
           nextState = POWER_FAILURE;
         }
         else {
-          turn_on_ps_at_prio(f2_enable, f1_enable, 2);
-          nextState = POWER_L2ON;
+          turn_on_ps_at_prio( 2);
+          nextState = POWER_KU;
+          #if defined(PROTO)
+            nextState = POWER_VU;
+          #endif
         }
 
         break;
       }
-      case POWER_L2ON: {
-        if (((supply_bitset & supply_ok_mask_L2) != supply_ok_mask_L2) && !ignorefail) {
-          failed_mask = (~supply_bitset) & supply_ok_mask_L2;
-          printfail(failed_mask, supply_ok_mask_L2, supply_bitset);
+      case POWER_KU: {
+        if (((supply_bitset & supply_ok_mask_ku) != supply_ok_mask_ku) && !ignorefail) {
+          failed_mask = (~supply_bitset) & supply_ok_mask_ku;
+          printfail(failed_mask, supply_ok_mask_ku, supply_bitset);
           errbuffer_power_fail(failed_mask);
           disable_ps();
           power_supply_alarm = true;
           nextState = POWER_FAILURE;
         }
         else {
-          turn_on_ps_at_prio(f2_enable, f1_enable, 3);
-          nextState = POWER_L3ON;
+          turn_on_ps_at_prio(3);
+          nextState = POWER_ZU;
         }
 
         break;
       }
-      case POWER_L3ON: { // FIXME allow this transition to fail on Rev2
-        // NO ENABLES AT L3. We always go to L4.
-        turn_on_ps_at_prio(f2_enable, f1_enable, 4);
-        nextState = POWER_L4ON;
-
-        break;
-      }
-      case POWER_L4ON: {
-        if (((supply_bitset & supply_ok_mask_L4) != supply_ok_mask_L4) && !ignorefail) {
-          failed_mask = (~supply_bitset) & supply_ok_mask_L4;
-          printfail(failed_mask, supply_ok_mask_L4, supply_bitset);
+      case POWER_ZU: {
+        if (((supply_bitset & supply_ok_mask_zu) != supply_ok_mask_zu) && !ignorefail) {
+          failed_mask = (~supply_bitset) & supply_ok_mask_zu;
+          printfail(failed_mask, supply_ok_mask_zu, supply_bitset);
           errbuffer_power_fail(failed_mask);
-
           disable_ps();
           power_supply_alarm = true;
           nextState = POWER_FAILURE;
         }
         else {
-          turn_on_ps_at_prio(f2_enable, f1_enable, 5);
-          nextState = POWER_L5ON;
+          turn_on_ps_at_prio(4);
+          nextState = POWER_FIREFLY;
         }
 
         break;
       }
-      case POWER_L5ON: {
-        if (((supply_bitset & supply_ok_mask_L5) != supply_ok_mask_L5) && !ignorefail) {
-          failed_mask = (~supply_bitset) & supply_ok_mask_L5;
-          printfail(failed_mask, supply_ok_mask_L5, supply_bitset);
+      case POWER_VU: {
+        if (((supply_bitset & supply_ok_mask_vu) != supply_ok_mask_vu) && !ignorefail) {
+          failed_mask = (~supply_bitset) & supply_ok_mask_vu;
+          printfail(failed_mask, supply_ok_mask_vu, supply_bitset);
           errbuffer_power_fail(failed_mask);
+          disable_ps();
+          power_supply_alarm = true;
+          nextState = POWER_FAILURE;
+        }
+        else {
+          turn_on_ps_at_prio(4);
+          nextState = POWER_FIREFLY;
+        }
 
+        break;
+      }
+      case POWER_FIREFLY: {
+        if (((supply_bitset & supply_ok_mask_ff) != supply_ok_mask_ff) && !ignorefail) {
+          failed_mask = (~supply_bitset) & supply_ok_mask_ff;
+          printfail(failed_mask, supply_ok_mask_ff, supply_bitset);
+          errbuffer_power_fail(failed_mask);
           disable_ps();
           power_supply_alarm = true;
           nextState = POWER_FAILURE;
