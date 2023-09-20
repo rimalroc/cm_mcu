@@ -10,7 +10,7 @@ endif
 ifndef REV1
 ifndef REV2
 DEVBOARD=1
-export REV2
+export DEVBOARD
 endif
 endif
 

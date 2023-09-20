@@ -94,7 +94,7 @@ enum pins {
 #define isFPGAF2_PRESENT() (read_gpio_pin(_F2_INSTALLED) == 0)
 
 #elif defined(DEVBOARD) 
-
+#warning "pins for Devboard have been defined"
 #define X(name, pin, port, localpin, input, type ) \
   name = pin,
 enum pins {

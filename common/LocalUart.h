@@ -15,7 +15,7 @@
 void UART0Init(uint32_t ui32SysClock);
 void UART1Init(uint32_t ui32SysClock);
 void UART4Init(uint32_t ui32SysClock);
-
+void UART5Init(uint32_t ui32SysClock);
 //*****************************************************************************
 //
 // Send a string to the UART4

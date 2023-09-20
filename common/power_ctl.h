@@ -135,7 +135,7 @@ void setPSStatus(int i, enum ps_state theState);
 bool turn_on_ps(uint16_t);
 bool check_ps(void);
 bool disable_ps(void);
-void turn_on_ps_at_prio(bool f2_enable, bool f1_enable, int prio);
+void turn_on_ps_at_prio(int prio);
 void blade_power_ok(bool isok);
 
 #endif /* COMMON_POWER_CTL_H_ */

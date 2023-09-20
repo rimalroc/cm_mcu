@@ -15,6 +15,7 @@
 #include "driverlib/rom_map.h"
 #include "driverlib/sysctl.h"
 #include "pinout.h"
+#include "pinsel.h"
 
 #include "common/utils.h"
 
@@ -333,19 +334,19 @@ void GpioInit_All(void)
 	write_gpio_pin(ZUP_CORE_RUN, 		(bool) (GPIO_DEFAULT_POWER_CTRL & 0x8));
 	write_gpio_pin(ZUP_PS_DDR4_TERM_EN, (bool) (GPIO_DEFAULT_POWER_CTRL & 0x10));
 	write_gpio_pin(ZUP_PL_DDR4_TERM_EN, (bool) (GPIO_DEFAULT_POWER_CTRL & 0x20));
-	write_gpio_pin(FIREFY_P1V8_RUN, 	(bool) (GPIO_DEFAULT_POWER_CTRL & 0x40));
+	//write_gpio_pin(FIREFY_P1V8_RUN, 	(bool) (GPIO_DEFAULT_POWER_CTRL & 0x40));
 	write_gpio_pin(FIREFY_P3V3_RUN, 	(bool) (GPIO_DEFAULT_POWER_CTRL & 0x80));
 //KupCtrlStat 0..2: KUP_PROG_B_3V3, KUP_INIT_B_3V3, KUP_DONE_3V3
 	write_gpio_pin(KUP_PROG_B_3V3, 	(bool) (GPIO_DEFAULT_KUP_CTRL_STAT & 0x1));
 	write_gpio_pin(KUP_INIT_B_3V3, 	(bool) (GPIO_DEFAULT_KUP_CTRL_STAT & 0x2));
-//	write_gpio_pin(KUP_DONE_3V3, (bool) (GPIO_DEFAULT_KUP_CTRL_STAT & 0x4));
+	//write_gpio_pin(KUP_DONE_3V3, (bool) (GPIO_DEFAULT_KUP_CTRL_STAT & 0x4));
 //ZupCtrlStat 0..5: ZUP_PS_PROG_B, ZUP_PS_INIT_B, ZUP_PS_DONE, ZUP_PS_nPOR, ZUP_PS_ERR_STATUS, ZUP_PS_ERR_OUT
 	write_gpio_pin(ZUP_PS_PROG_B, 	(bool) (GPIO_DEFAULT_ZUP_CTRL_STAT & 0x1));
 	write_gpio_pin(ZUP_PS_INIT_B, 	(bool) (GPIO_DEFAULT_ZUP_CTRL_STAT & 0x2));
-//	write_gpio_pin(ZUP_PS_DONE, (bool) (GPIO_DEFAULT_ZUP_CTRL_STAT & 0x4));
+	//	write_gpio_pin(ZUP_PS_DONE, (bool) (GPIO_DEFAULT_ZUP_CTRL_STAT & 0x4));
 	write_gpio_pin(ZUP_PS_nPOR, 	(bool) (GPIO_DEFAULT_ZUP_CTRL_STAT & 0x8));
-//	write_gpio_pin(ZUP_PS_ERR_STATUS, (bool) (GPIO_DEFAULT_ZUP_CTRL_STAT & 0x10));
-//	write_gpio_pin(ZUP_PS_ERR_OUT, (bool) (GPIO_DEFAULT_ZUP_CTRL_STAT & 0x20));
+	//	write_gpio_pin(ZUP_PS_ERR_STATUS, (bool) (GPIO_DEFAULT_ZUP_CTRL_STAT & 0x10));
+	//	write_gpio_pin(ZUP_PS_ERR_OUT, (bool) (GPIO_DEFAULT_ZUP_CTRL_STAT & 0x20));
 // Reset 0..1: I2C_MUX_nRST, MCU_PEx_nRST
 	write_gpio_pin(I2C_MUX_nRST, 	(bool) (GPIO_DEFAULT_RESET & 0x1));
 	write_gpio_pin(MCU_PEx_nRST, 	(bool) (GPIO_DEFAULT_RESET & 0x2));

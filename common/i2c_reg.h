@@ -24,6 +24,8 @@ void initI2C4(const uint32_t sysclockfreq); // F1 optics I2C bus
 void initI2C5(const uint32_t sysclockfreq); // FPGA     I2C bus (Rev2)
 void initI2C6(const uint32_t sysclockfreq); // FPGA     I2C bus (Rev1)
 
+void initI2C_all(const uint32_t sysclockfreq);
+
 // write to an i2c register
 bool writeI2Creg(uint32_t i2cbase, uint8_t ui8Addr, uint8_t ui8Reg, uint8_t *Data,
                  const uint8_t ui8ByteCount);

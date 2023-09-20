@@ -7,7 +7,6 @@
    // Blade control, SM_PWR_ENA and CM_READY
    X(BLADE_POWER_OK, 7,    N, 2, false, GPIO_PIN_TYPE_STD)
    X(BLADE_POWER_EN, 8,    N, 3, true, GPIO_PIN_TYPE_STD_WPD)
-   X(I2C_MUX_nRST, 52, Q, 6, false, GPIO_PIN_TYPE_STD)
    // Power Demo
    // Power -> Clock (first to power up, last to power down)
    X(CLK_PM_CTRL0,   9,    H, 1, false, GPIO_PIN_TYPE_STD)

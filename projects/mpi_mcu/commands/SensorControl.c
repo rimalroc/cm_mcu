@@ -92,14 +92,8 @@ BaseType_t power_ctl(int argc, char **argv, char *m)
   }
   else if (strncmp(argv[1], "status", 5) == 0) { // report status to UART
     int copied = 0;
-    bool f1_enable = (isFPGAF1_PRESENT());
-    bool f2_enable = (isFPGAF2_PRESENT());
     static int i = 0;
     if (i == 0) {
-      copied += snprintf(m + copied, SCRATCH_SIZE - copied,
-                         "%s:\r\nF1_ENABLE:\t%d\r\n"
-                         "F2_ENABLE:\t%d\r\n",
-                         argv[0], f1_enable, f2_enable);
       copied += snprintf(m + copied, SCRATCH_SIZE - copied, "State machine state: %s\r\n",
                          getPowerControlStateName(getPowerControlState()));
       copied += snprintf(m + copied, SCRATCH_SIZE - copied, "External Alarm: %d\r\n",
