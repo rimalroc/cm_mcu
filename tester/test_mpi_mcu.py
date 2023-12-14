@@ -49,11 +49,12 @@ for command in commands:
             break
         response += line + '\n'
 
-    if response == 'Command unknown' \
+    if response == '' \
+        or response == 'Command unknown' \
         or 'Error' in response \
         or 'error' in response \
         or 'ERROR' in response :
-        print(f"Test failed for command: {command}")
+        print(f"Test failed for command {command} -> response: {response}")
         exit_code = 1
         break
     else:
