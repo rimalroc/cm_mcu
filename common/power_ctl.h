@@ -107,12 +107,13 @@ void setPSStatus(int i, enum ps_state theState);
 #elif defined(DEVBOARD)
 #define N_PS_ENABLES      4
 #define N_PS_OKS          4
+#warning "Rimsky update PS_OKS_MASK"
 #define PS_OKS_MASK       ((1U << N_PS_OKS) - 1)
 #define PS_OKS_GEN_MASK   0x00U
 #define PS_ENS_GEN_MASK   0x001U
 #define PS_ENS_F1_MASK    0x0U
 #define PS_ENS_F2_MASK    0x0U
-
+#define ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]))
 // OK masks for various stages of the turn-on.
 // these are indices into the oks[] array
 // L1-L6

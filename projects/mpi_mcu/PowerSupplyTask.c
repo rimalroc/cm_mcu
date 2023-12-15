@@ -38,10 +38,11 @@ enum power_system_state getPowerControlState(void)
 }
 
 extern const struct gpio_pin_t oks[];
+extern int32_t N_PS_OKS_;
 static uint16_t check_ps_oks(void)
 {
   uint16_t status = 0U;
-  for (int i = 0; i < N_PS_OKS; ++i) {
+  for (int i = 0; i < N_PS_OKS_; ++i) {
     int val = read_gpio_pin(oks[i].pin_number);
     if (val)
       status |= 1U << i;
@@ -185,7 +186,7 @@ void PowerSupplyTask(void *parameters)
       }
     }
     #ifdef DEVBOARD
-    bool ignorefail = false; // HACK THIS NEEDS TO BE FIXED TODO FIXME
+    bool ignorefail = true; // HACK THIS NEEDS TO BE FIXED TODO FIXME
     #else
     // the OKS needs to be read using the gpio expander.
     // need to decide if a task will read them, or will be read on demand.
@@ -363,7 +364,7 @@ void PowerSupplyTask(void *parameters)
     // update the ps_state variables, for external display
     // as well as for usage in ensuring the I2C pullups are on.
     supply_bitset = check_ps_oks();
-    for (int i = 0; i < N_PS_OKS; i++) {
+    for (int i = 0; i < N_PS_OKS_; i++) {
       if ((1U << i) & supply_bitset) {
         // OK bit is on -- PS is on
         setPSStatus(i, PWR_ON);

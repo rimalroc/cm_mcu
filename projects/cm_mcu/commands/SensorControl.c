@@ -362,7 +362,7 @@ BaseType_t psmon_ctl(int argc, char **argv, char *m)
 }
 
 // send power control commands
-extern struct gpio_pin_t oks[N_PS_OKS];
+extern struct gpio_pin_t oks[];
 BaseType_t power_ctl(int argc, char **argv, char *m)
 {
   int s = SCRATCH_SIZE;

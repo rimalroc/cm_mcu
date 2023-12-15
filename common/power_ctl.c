@@ -92,7 +92,7 @@ static const struct gpio_pin_t enables[] = {
 // but only enabled for the fireflies at L6. At L6 we don't actually 
 // turn on the supplies, but instead enable them for the fireflies.
 const
-struct gpio_pin_t oks[N_PS_OKS] = {
+struct gpio_pin_t oks[] = {
     { PG_F1_INT_A, "PG_F1_INT_A", 1},
     { PG_F1_INT_B, "PG_F1_INT_B", 1},
     { PG_F2_INT_A, "PG_F2_INT_A", 1},
@@ -108,7 +108,7 @@ struct gpio_pin_t oks[N_PS_OKS] = {
     //{ PG_4V0, "PG_4V0", 6},  // enable_3v8(true/false) won't change PG_4V0. Only within 10s after 4.0V off, PG_4V0 can be 0x0.
 };
 #elif defined(DEVBOARD)
-
+// if you update this you need to update N_PS_ENABLES
 static const struct gpio_pin_t enables[] = {
     { BLADE_POWER_OK, "BLADE_POWER_EN", 1},
     { CLK_PM_CTRL0, "CLK_PM_CTRL0", 1},
@@ -128,8 +128,9 @@ static const struct gpio_pin_t enables[] = {
 };
 // oks should be a Power Good indicator
 // for the moment just check the status of the ctrl pin
+//if you update this you need to update N_PS_OKS too
 const
-struct gpio_pin_t oks[N_PS_OKS] = {
+struct gpio_pin_t oks[] = {
     { CLK_PM_CTRL0, "CLK_PM_CTRL0", 1},
 
     { KUP_CORE_RUN,     "KUP_CORE_RUN", 2},
@@ -144,6 +145,7 @@ struct gpio_pin_t oks[N_PS_OKS] = {
 
     { FIREFY_P3V3_RUN, "FIREFY_P3V3_RUN", 4},
 };
+const int32_t N_PS_OKS_ = ARRAY_SIZE(oks);
 #elif defined(DEMO)
 #warning "pins for Demo havne't been defined"
 #elif defined(PROTO)
@@ -156,17 +158,17 @@ struct gpio_pin_t oks[N_PS_OKS] = {
 #define PS_NUM_PRIORITIES 6
 
 // these arrays hold the current and old status of these power supplies
-static enum ps_state states[N_PS_OKS] = {PWR_UNKNOWN};
+static enum ps_state states[ARRAY_SIZE(oks)] = {PWR_UNKNOWN};
 enum ps_state getPSStatus(int i)
 {
-  if (i < 0 || i >= N_PS_OKS)
+  if (i < 0 || i >= N_PS_OKS_)
     return PWR_UNKNOWN;
   return states[i];
 }
 
 void setPSStatus(int i, enum ps_state theState)
 {
-  if (i < 0 || i >= N_PS_OKS)
+  if (i < 0 || i >= N_PS_OKS_)
     return;
   states[i] = theState;
 }
@@ -177,7 +179,7 @@ bool disable_ps(void)
 {
   // first set the supplies to off to tell the
   // other tasks to prepare
-  for (int o = 0; o < N_PS_OKS; ++o)
+  for (int o = 0; o < N_PS_OKS_; ++o)
     if (states[o] != PWR_DISABLED)
       states[o] = PWR_OFF;
   // this long delay (probably too long) allows all I2C tasks
@@ -189,7 +191,7 @@ bool disable_ps(void)
   // disable in reverse order
   for (int prio = PS_NUM_PRIORITIES; prio > 0; --prio) {
     // disable the supplies at the relevant priority and reverse order
-    for (int e = N_PS_ENABLES; e > 0 ; --e) {
+    for (int e = ARRAY_SIZE(enables); e > 0 ; --e) {
       if (enables[e].priority == prio) {
         write_gpio_pin(enables[e].pin_number, 0x0);
       }
@@ -197,7 +199,7 @@ bool disable_ps(void)
     bool ready_to_proceed = false;
     while (!ready_to_proceed) {
       bool all_ready = true;
-      for (int o = 0; o < N_PS_OKS; ++o) {
+      for (int o = 0; o < N_PS_OKS_; ++o) {
         if (oks[o].priority >= prio) {
           uint8_t val = read_gpio_pin(oks[o].pin_number);
           if (val == 1) { // all supplies are supposed to be off now
@@ -238,7 +240,7 @@ bool turn_on_ps(uint16_t ps_en_mask)
   // loop over the enables
   for (int prio = 1; prio <= PS_NUM_PRIORITIES; ++prio) {
     // enable the supplies at the relevant priority
-    for (int e = 0; e < N_PS_ENABLES; ++e) {
+    for (int e = 0; e < ARRAY_SIZE(enables); ++e) {
       if (enables[e].priority == prio) {
         // check if this supply is to be enabled
         if (((1U << e) & ps_en_mask) == 0) // not in mask
@@ -256,7 +258,7 @@ bool turn_on_ps(uint16_t ps_en_mask)
 void turn_on_ps_at_prio(int prio)
 {
   // loop over the enables
-  for (int e = 0; e < N_PS_ENABLES; ++e) {
+  for (int e = 0; e < ARRAY_SIZE(enables); ++e) {
     // if this enable matches the requested priority
     if (enables[e].priority == prio) {
       // no checks to be done

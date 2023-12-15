@@ -291,9 +291,10 @@ int log_add_fp(FILE *fp, int level)
 
 static void init_event(log_Event *ev, void *udata)
 {
-#ifdef REV1 // no RTC in Rev1
+#if defined(REV1) || defined(DEVBOARD) // no RTC in Rev1
   ev->time = xTaskGetTickCount();
 #else  // REV2 and later
+#warning "Rimsky, check this.. is not working on DEVBOARD, no idea on the blade yet"
   struct tm now;
   ROM_HibernateCalendarGet(&now);
   if (now.tm_year < 120) { // RTC not yet set

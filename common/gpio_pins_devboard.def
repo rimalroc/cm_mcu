@@ -2,11 +2,11 @@
    X(TM4C_LED_BLUE,  2,    N, 0, false, GPIO_PIN_TYPE_STD) 
    X(TM4C_LED_GREEN, 3,    N, 1, false, GPIO_PIN_TYPE_STD) 
    X(TM4C_LED_RED,   4,    F, 0, false, GPIO_PIN_TYPE_STD) 
-   X(_V_FPGA_DONE,   5,    J, 1, true, GPIO_PIN_TYPE_STD) 
+   X(_V_FPGA_DONE,   5,    N, 3, true, GPIO_PIN_TYPE_STD) 
    X(TM4C_DIP_SW_1,  6,    J, 0, true, GPIO_PIN_TYPE_STD_WPU) 
    // Blade control, SM_PWR_ENA and CM_READY
    X(BLADE_POWER_OK, 7,    N, 2, false, GPIO_PIN_TYPE_STD)
-   X(BLADE_POWER_EN, 8,    N, 3, true, GPIO_PIN_TYPE_STD_WPD)
+   X(BLADE_POWER_EN, 8,    J, 1, true, GPIO_PIN_TYPE_STD_WPU)
    // Power Demo
    // Power -> Clock (first to power up, last to power down)
    X(CLK_PM_CTRL0,   9,    H, 1, false, GPIO_PIN_TYPE_STD)

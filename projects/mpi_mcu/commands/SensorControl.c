@@ -12,6 +12,7 @@
 #include "Semaphore.h"
 #include "common/smbus_helper.h"
 #include "Tasks.h"
+#include "common/pinsel.h"
 
 // Register definitions
 // -------------------------------------------------
@@ -75,7 +76,8 @@ BaseType_t psmon_ctl(int argc, char **argv, char *m)
 }
 */
 // send power control commands
-extern struct gpio_pin_t oks[N_PS_OKS];
+extern struct gpio_pin_t oks[];
+extern int32_t N_PS_OKS_;
 BaseType_t power_ctl(int argc, char **argv, char *m)
 {
   int s = SCRATCH_SIZE;
@@ -99,7 +101,7 @@ BaseType_t power_ctl(int argc, char **argv, char *m)
       copied += snprintf(m + copied, SCRATCH_SIZE - copied, "External Alarm: %d\r\n",
                          getPowerControlExternalAlarmState());
     }
-    for (; i < N_PS_OKS; ++i) {
+    for (; i < N_PS_OKS_; ++i) {
       enum ps_state j = getPSStatus(i);
       char *c;
       switch (j) {
@@ -125,7 +127,7 @@ BaseType_t power_ctl(int argc, char **argv, char *m)
 
       copied +=
           snprintf(m + copied, SCRATCH_SIZE - copied, "%16s: %s\r\n", oks[i].name, c);
-      if ((SCRATCH_SIZE - copied) < 20 && (i < N_PS_OKS)) {
+      if ((SCRATCH_SIZE - copied) < 20 && (i < N_PS_OKS_)) {
         ++i;
         return pdTRUE;
       }
@@ -137,10 +139,10 @@ BaseType_t power_ctl(int argc, char **argv, char *m)
     int copied = 0;
     static int i = 0;
     uint16_t ignore_mask = getPowerControlIgnoreMask();
-    for (; i < N_PS_OKS; ++i) {
+    for (; i < N_PS_OKS_; ++i) {
       BaseType_t ignored = (ignore_mask & (0x1U << i)) != 0;
       copied += snprintf(m + copied, SCRATCH_SIZE - copied, "%-16s: %ld\r\n", oks[i].name, ignored);
-      if ((SCRATCH_SIZE - copied) < 20 && (i < N_PS_OKS)) {
+      if ((SCRATCH_SIZE - copied) < 20 && (i < N_PS_OKS_)) {
         ++i;
         return pdTRUE;
       }
@@ -440,6 +442,7 @@ BaseType_t sensor_summary(int argc, char **argv, char *m)
   else
     max_fpga = fpga_args.pm_values[0];
     */
+  //max_fpga = fpga_args.pm_values[0];
   float_to_ints(max_fpga, &tens, &frac);
   copied += snprintf(m + copied, SCRATCH_SIZE - copied, "FPGA %02d.%02d\r\n", tens, frac);
 
