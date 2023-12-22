@@ -107,10 +107,10 @@ struct gpio_pin_t oks[] = {
     { PG_F2_AVTT, "PG_F2_AVTT", 5},
     //{ PG_4V0, "PG_4V0", 6},  // enable_3v8(true/false) won't change PG_4V0. Only within 10s after 4.0V off, PG_4V0 can be 0x0.
 };
-#elif defined(DEVBOARD)
+#elif defined(DEVBOARD) || defined(TESTBOARD)
+// DEVBOARD and TESTBOARD should disapear from here once the correct power sequence is set for DEMO and PROTO
 // if you update this you need to update N_PS_ENABLES
 static const struct gpio_pin_t enables[] = {
-    { BLADE_POWER_OK, "BLADE_POWER_EN", 1},
     { CLK_PM_CTRL0, "CLK_PM_CTRL0", 1},
 
     { KUP_CORE_RUN,     "KUP_CORE_RUN", 2},
@@ -124,7 +124,6 @@ static const struct gpio_pin_t enables[] = {
     { ZUP_PM_CTRL0, "ZUP_PM_CTRL0", 3},
 
     { FIREFY_P3V3_RUN, "FIREFY_P3V3_RUN", 4},
-    
 };
 // oks should be a Power Good indicator
 // for the moment just check the status of the ctrl pin

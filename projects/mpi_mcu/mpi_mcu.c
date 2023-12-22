@@ -419,7 +419,7 @@ int main(void)
   // Say hello. The information below is only updated when the main()
   // function is recompiled.
   Print("\r\n----------------------------\r\n");
-  Print("Staring Apollo CM MCU firmware ");
+  Print("Starting Apollo CM MCU firmware ");
   Print(gitVersion());
 #ifdef DEVBOARD
   Print("\r\nDEVBOARD\r\n");

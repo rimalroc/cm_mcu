@@ -105,7 +105,7 @@ void setPSStatus(int i, enum ps_state theState);
 #define PS_OKS_F2_MASK_L4 0x200U
 #define PS_OKS_F2_MASK_L5 0x800U
 #elif defined(DEVBOARD)
-#define N_PS_ENABLES      4
+//#define N_PS_ENABLES      4
 #define N_PS_OKS          4
 #warning "Rimsky update PS_OKS_MASK"
 #define PS_OKS_MASK       ((1U << N_PS_OKS) - 1)
