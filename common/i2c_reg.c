@@ -361,6 +361,36 @@ void initI2C(int I2C_number, const uint32_t sysclockfreq)
 
 
 }
+
+void initI2C_as_slave(int I2C_number, const uint32_t sysclockfreq)
+{
+  // enable I2C module 0
+  MAP_SysCtlPeripheralEnable(SYSCTL_PERIPH_I2C[I2C_number]);
+  //
+  // Wait for the I2C0 module to be ready.
+  while (!MAP_SysCtlPeripheralReady(SYSCTL_PERIPH_I2C[I2C_number])) {
+  }
+
+  // Stop the Clock, Reset and Enable I2C Module
+  // in Master Function
+  MAP_SysCtlPeripheralDisable(SYSCTL_PERIPH_I2C[I2C_number]);
+  MAP_SysCtlPeripheralReset(SYSCTL_PERIPH_I2C[I2C_number]);
+  MAP_SysCtlPeripheralEnable(SYSCTL_PERIPH_I2C[I2C_number]);
+
+  while (!MAP_SysCtlPeripheralReady(SYSCTL_PERIPH_I2C[I2C_number]))
+    ;
+
+  // Enable the module as a slave
+  uint8_t slave_addr = 0x50;
+  MAP_I2CSlaveInit(I2C_BASE[I2C_number], slave_addr);
+
+  // clear I2C FIFOs
+  // HWREG(I2C0_BASE + I2C_0_FIFOCTL) = 80008000;
+  MAP_I2CRxFIFOFlush(I2C_BASE[I2C_number]);
+  MAP_I2CTxFIFOFlush(I2C_BASE[I2C_number]);
+
+  // no resets here
+}
 #endif
 
 
@@ -374,7 +404,7 @@ void initI2C_all(const uint32_t sysclockfreq)
   initI2C(4,sysclockfreq);
   initI2C(5,sysclockfreq);
   initI2C(6,sysclockfreq);
-  initI2C(7,sysclockfreq);
+  initI2C_as_slave(7,sysclockfreq);
   initI2C(8,sysclockfreq);
   write_gpio_pin(I2C_MUX_nRST, 0x0); // active low
   MAP_SysCtlDelay(sysclockfreq / 10);

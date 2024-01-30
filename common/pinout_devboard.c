@@ -37,7 +37,7 @@
 void
 PinoutSet(void)
 {
-#if defined(PART_TM4C1294NCPDT)
+#if defined(PART_TM4C1294NCPDT) || defined(PART_TM4C129ENCPDT)
 #warning "using alternative pins definition"
 
 
@@ -102,6 +102,7 @@ PinoutSet(void)
 
 // gpios
 #ifdef DEVBOARD
+// configure the GPIO pins
 #define X(NAME, PPIN, PPORT, LOCALPIN, INPUT, TYPE) \
 	if (INPUT){ \
     	MAP_GPIOPinTypeGPIOInput(GPIO_PORT##PPORT##_BASE, GPIO_PIN_##LOCALPIN); \
@@ -110,9 +111,45 @@ PinoutSet(void)
 	else	\
 		MAP_GPIOPinTypeGPIOOutput(GPIO_PORT##PPORT##_BASE, GPIO_PIN_##LOCALPIN);
 
-
-
 #include "common/gpio_pins_devboard.def"
+
+const uint32_t GPIO_PORT_BASE_I2C[] = 
+                { GPIO_PORTB_BASE, GPIO_PORTG_BASE
+                , GPIO_PORTG_BASE, GPIO_PORTG_BASE
+                , GPIO_PORTG_BASE, GPIO_PORTB_BASE
+                , GPIO_PORTA_BASE, GPIO_PORTD_BASE
+                , GPIO_PORTD_BASE };
+
+const uint32_t GPIO_Pxx_I2CxSCL[] = 
+                { GPIO_PB2_I2C0SCL, GPIO_PG0_I2C1SCL
+                , GPIO_PL1_I2C2SCL, GPIO_PK4_I2C3SCL
+                , GPIO_PK6_I2C4SCL, GPIO_PB0_I2C5SCL
+                , GPIO_PA6_I2C6SCL, GPIO_PORTD_BAS
+                , GPIO_PORTD_BAS };
+const uint32_t GPIO_Pxx_I2CxSDA[] = 
+                { GPIO_PB3_I2C0SDA, GPIO_PG1_I2C1SDA
+                , GPIO_PN4_I2C2SDA, GPIO_PK5_I2C3SDA
+                , GPIO_PK7_I2C4SDA, GPIO_PORTB_BAS
+                , GPIO_PA7_I2C6SDA, GPIO_PORTD_BAS
+                , GPIO_PORTD_BAS };
+// configure the I2C pins
+#define SCL 1
+#define SDA 2
+#define X(NAME, PIN_TYPE, RPIN, PPORT, LOCALPIN, NI2C, RESET) \
+if ( PIN_TYPE == SDA) {\
+	MAP_GPIOPinConfigure(GPIO_P##PPORT####LOCALPIN##_I2C##NI2C##SDA); \
+	MAP_GPIOPinTypeI2C(GPIO_PORT##PPORT##_BASE, GPIO_PIN_##LOCALPIN); \
+} else if ( PIN_TYPE == SCL) {\
+	MAP_GPIOPinConfigure(GPIO_P##PPORT####LOCALPIN##_I2C##NI2C##SCL);				\
+	MAP_GPIOPinTypeI2CSCL(GPIO_PORT##PPORT##_BASE, GPIO_PIN_##LOCALPIN); \
+} else { \
+	_Static_assert(false, "##PIN_TYPE##"); \
+}
+
+#include "common/i2c_pins_demo.def"
+#undef SCL 
+#undef SDA 
+
 #elif defined(DEMO)
 #warning "pins for Demo havne't been defined"
 #elif defined(PROTO)
@@ -121,6 +158,8 @@ PinoutSet(void)
 #error "need to define either DEVBOARD, DEMO or PROTO"
 #endif
 
+
+/*
     //
     // Configure the GPIO Pin Mux for PB2
 	// for I2C0SCL
@@ -204,7 +243,7 @@ PinoutSet(void)
     //
 	MAP_GPIOPinConfigure(GPIO_PA7_I2C6SDA);
 	MAP_GPIOPinTypeI2C(GPIO_PORTA_BASE, GPIO_PIN_7);
-
+*/
     //
     // Configure the GPIO Pin Mux for PA0
 	// for U0RX
