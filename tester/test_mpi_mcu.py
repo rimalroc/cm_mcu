@@ -40,6 +40,7 @@ def simple_test_command (command):
     exit_code = 0
     ser.write(command.encode())
     response = ''
+    command_ = command.replace('\r\n','')
     while True:
         line = ser.readline().decode().strip()
         if line == '':
@@ -51,13 +52,13 @@ def simple_test_command (command):
         or 'Error' in response \
         or 'error' in response \
         or 'ERROR' in response :
-        print(f"Test failed for command {command} -> response: {response}")
+        print(f"Test failed for command {command_} -> response: {response}")
         exit_code = 1
     else:
         if ops.v:
-            print(f"Response for command {command}: {response}")
+            print(f"Response for command {command_}: {response}")
         else:
-            print(f"OK")
+            print(f"Command {command_}: OK")
     return exit_code
     
 # Establish connection to the USB device

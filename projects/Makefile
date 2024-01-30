@@ -1,6 +1,6 @@
 
 
-DIRS=uart_echo blinky mpi_mcu #boot_loader cm_mcu #i2c-sensors 
+DIRS=uart_echo blinky mpi_mcu mpi_mcu_tester#boot_loader cm_mcu #i2c-sensors 
 
 DIRSCLEAN=$(addsuffix .clean,$(DIRS))
 
