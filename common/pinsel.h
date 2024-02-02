@@ -94,12 +94,31 @@ enum pins {
 #define isFPGAF2_PRESENT() (read_gpio_pin(_F2_INSTALLED) == 0)
 
 #elif defined(DEVBOARD) 
+// First define the i2c pins, is better to define in a .def file and include it as done for common/i2c_pins_demo.def
+// but defining this way is faster, more intuitive for the begining and also
+// VScode shows you inmediately if the expansion works good
+#define I2C_DEVBOARD_PINS \
+X(I2C_ZUP_PM, B, 2, 3, 0, none, true) \
+X(I2C_KUP_PM, G, 0, 1, 1, none, true) \
+X(I2C_KUP_SYSMON, B, 0, 1, 5, none, true) \
+X(I2C_MCU_IPMC_ZUP, D, 0, 1, 7, none, false) \
+X(I2C_KUP_RESERVED, D, 2, 3, 8, none, true) 
+
+//i2c pins
+#define X(NAME, PPORT, SCL_PIN, SDA_PIN, NI2C, RESET, isMASTER) \
+  NAME = NI2C,
+enum i2c_pins {
+//#include "common/i2c_pins_demo.def"
+I2C_DEVBOARD_PINS
+};
+#undef X
 #warning "pins for Devboard have been defined"
 #define X(name, pin, port, localpin, input, type ) \
   name = pin,
 enum pins {
 #include "gpio_pins_devboard.def"
 };
+
 #elif defined(DEMO)
 #warning "pins for Demo havne't been defined"
 #elif defined(PROTO)

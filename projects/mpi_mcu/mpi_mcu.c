@@ -23,7 +23,7 @@
 //#include "common/power_ctl.h"
 #include "common/i2c_reg.h"
 #include "common/pinout.h"
-//#include "common/pinsel.h"
+#include "common/pinsel.h"
 //#include "common/smbus.h"
 //#include "common/log.h"
 #include "CommandLineTask.h"
@@ -173,40 +173,42 @@ initI2C_all(g_ui32SysClock);
   // smbus
   // Initialize the master SMBus port.
   //
-  #if defined(DEVBOARD) || defined(DEMO)
-  SMBusMasterInit(&g_sMaster0, I2C0_BASE, g_ui32SysClock);
-  SMBusMasterInit(&g_sMaster1, I2C1_BASE, g_ui32SysClock);
-  SMBusMasterInit(&g_sMaster2, I2C2_BASE, g_ui32SysClock);
-  SMBusMasterInit(&g_sMaster3, I2C3_BASE, g_ui32SysClock);
-  SMBusMasterInit(&g_sMaster4, I2C4_BASE, g_ui32SysClock);
-  SMBusMasterInit(&g_sMaster5, I2C5_BASE, g_ui32SysClock);
-  SMBusMasterInit(&g_sMaster6, I2C6_BASE, g_ui32SysClock);
-  SMBusMasterInit(&g_sMaster8, I2C8_BASE, g_ui32SysClock);
+  #if defined(DEVBOARD) 
+  #define X(NAME, PPORT, SCL_PIN, SDA_PIN, NI2C, RESET, isMASTER) \
+  if (isMASTER) { \
+    SMBusMasterInit(&g_sMaster##NI2C, I2C##NI2C##_BASE, g_ui32SysClock); \
+  } 
+
+//#include "common/i2c_pins_demo.def"
+I2C_DEVBOARD_PINS
+  #undef X
+
+// FreeRTOS insists that the priority of interrupts be set up like this.
+  #define X(NAME, PPORT, SCL_PIN, SDA_PIN, NI2C, RESET, isMASTER) \
+    ROM_IntPrioritySet(INT_I2C##NI2C, configKERNEL_INTERRUPT_PRIORITY);
+
+//#include "common/i2c_pins_demo.def"
+I2C_DEVBOARD_PINS
+  #undef X
+
+  //
+  // Enable I2C master interrupts.
+  //
+  #define X(NAME, PPORT, SCL_PIN, SDA_PIN, NI2C, RESET, isMASTER) \
+  if (isMASTER) { \
+    SMBusMasterIntEnable(&g_sMaster##NI2C); \
+  } 
+
+//#include "common/i2c_pins_demo.def"
+I2C_DEVBOARD_PINS
+  #undef X
+  #elif defined(DEMO)
+  #error missing definitions here
   #else
   #error missing definitions here
   #endif
 
-  // FreeRTOS insists that the priority of interrupts be set up like this.
-  ROM_IntPrioritySet(INT_I2C0, configKERNEL_INTERRUPT_PRIORITY);
-  ROM_IntPrioritySet(INT_I2C1, configKERNEL_INTERRUPT_PRIORITY);
-  ROM_IntPrioritySet(INT_I2C2, configKERNEL_INTERRUPT_PRIORITY);
-  ROM_IntPrioritySet(INT_I2C3, configKERNEL_INTERRUPT_PRIORITY);
-  ROM_IntPrioritySet(INT_I2C4, configKERNEL_INTERRUPT_PRIORITY);
-  ROM_IntPrioritySet(INT_I2C5, configKERNEL_INTERRUPT_PRIORITY);
-  ROM_IntPrioritySet(INT_I2C6, configKERNEL_INTERRUPT_PRIORITY);
-  ROM_IntPrioritySet(INT_I2C7, configKERNEL_INTERRUPT_PRIORITY);
-  ROM_IntPrioritySet(INT_I2C8, configKERNEL_INTERRUPT_PRIORITY);
-  //
-  // Enable I2C master interrupts.
-  //
-  SMBusMasterIntEnable(&g_sMaster0);
-  SMBusMasterIntEnable(&g_sMaster1);
-  SMBusMasterIntEnable(&g_sMaster2);
-  SMBusMasterIntEnable(&g_sMaster3);
-  SMBusMasterIntEnable(&g_sMaster4);
-  SMBusMasterIntEnable(&g_sMaster5);
-  SMBusMasterIntEnable(&g_sMaster6);
-  SMBusMasterIntEnable(&g_sMaster8);
+
 
 #if defined(REV1)
   SMBusMasterIntEnable(&g_sMaster6);

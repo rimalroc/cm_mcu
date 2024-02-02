@@ -113,6 +113,8 @@ PinoutSet(void)
 
 #include "common/gpio_pins_devboard.def"
 
+// The following definition is deprecated
+/*
 const uint32_t GPIO_PORT_BASE_I2C[] = 
                 { GPIO_PORTB_BASE, GPIO_PORTG_BASE
                 , GPIO_PORTG_BASE, GPIO_PORTG_BASE
@@ -124,31 +126,32 @@ const uint32_t GPIO_Pxx_I2CxSCL[] =
                 { GPIO_PB2_I2C0SCL, GPIO_PG0_I2C1SCL
                 , GPIO_PL1_I2C2SCL, GPIO_PK4_I2C3SCL
                 , GPIO_PK6_I2C4SCL, GPIO_PB0_I2C5SCL
-                , GPIO_PA6_I2C6SCL, GPIO_PORTD_BAS
-                , GPIO_PORTD_BAS };
+                , GPIO_PA6_I2C6SCL, GPIO_PORTD_BASE
+                , GPIO_PORTD_BASE };
 const uint32_t GPIO_Pxx_I2CxSDA[] = 
                 { GPIO_PB3_I2C0SDA, GPIO_PG1_I2C1SDA
                 , GPIO_PN4_I2C2SDA, GPIO_PK5_I2C3SDA
-                , GPIO_PK7_I2C4SDA, GPIO_PORTB_BAS
-                , GPIO_PA7_I2C6SDA, GPIO_PORTD_BAS
-                , GPIO_PORTD_BAS };
-// configure the I2C pins
-#define SCL 1
-#define SDA 2
-#define X(NAME, PIN_TYPE, RPIN, PPORT, LOCALPIN, NI2C, RESET) \
-if ( PIN_TYPE == SDA) {\
-	MAP_GPIOPinConfigure(GPIO_P##PPORT####LOCALPIN##_I2C##NI2C##SDA); \
-	MAP_GPIOPinTypeI2C(GPIO_PORT##PPORT##_BASE, GPIO_PIN_##LOCALPIN); \
-} else if ( PIN_TYPE == SCL) {\
-	MAP_GPIOPinConfigure(GPIO_P##PPORT####LOCALPIN##_I2C##NI2C##SCL);				\
-	MAP_GPIOPinTypeI2CSCL(GPIO_PORT##PPORT##_BASE, GPIO_PIN_##LOCALPIN); \
-} else { \
-	_Static_assert(false, "##PIN_TYPE##"); \
-}
+                , GPIO_PK7_I2C4SDA, GPIO_PORTB_BASE
+                , GPIO_PA7_I2C6SDA, GPIO_PORTD_BASE
+                , GPIO_PORTD_BASE };
+*/
 
-#include "common/i2c_pins_demo.def"
-#undef SCL 
-#undef SDA 
+///////////////////////////
+// configure the I2C pins
+
+// First define the pins, is better to define in a .def file and include it as done for common/i2c_pins_demo.def
+// but defining this way is faster, more intuitive for the begining and also
+// VScode shows you inmediately if the expansion works good
+// #define DEVPINS // now defined in pinsel.h
+
+#define X(NAME, PPORT, SCL_PIN, SDA_PIN, NI2C, RESET, isMASTER) \
+    MAP_GPIOPinConfigure(GPIO_P##PPORT##SDA_PIN##_I2C##NI2C##SDA); \
+    MAP_GPIOPinTypeI2C(GPIO_PORT##PPORT##_BASE, GPIO_PIN_##SDA_PIN); \
+    MAP_GPIOPinConfigure(GPIO_P##PPORT##SCL_PIN##_I2C##NI2C##SCL); \
+    MAP_GPIOPinTypeI2CSCL(GPIO_PORT##PPORT##_BASE, GPIO_PIN_##SCL_PIN); 
+
+//#include "common/i2c_pins_demo.def"
+I2C_DEVBOARD_PINS
 
 #elif defined(DEMO)
 #warning "pins for Demo havne't been defined"

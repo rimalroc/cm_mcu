@@ -191,6 +191,8 @@ tSMBus g_sMaster5; // for I2C #5
 tSMBus g_sMaster6; // for I2C #6
 tSMBus g_sMaster8; // for I2C #8
 
+
+
 volatile tSMBusStatus eStatus0 = SMBUS_OK;
 volatile tSMBusStatus eStatus1 = SMBUS_OK;
 volatile tSMBusStatus eStatus2 = SMBUS_OK;

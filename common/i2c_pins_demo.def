@@ -1,23 +1,14 @@
 // X-macros file for I2C pins, L0MDT
 // 07/2023
-// Format: Name, type, pin_ref, GPIO Port, GPIO Port pin, i2c dev, reset pin
-X(ZUP_PM_SCL,  SCL, 91, B, 2, 0, none) 
-X(ZUP_PM_SDA,  SDA, 92, B, 3, 0, none) 
-X(KUP_PM_SCL,  SCL, 49, G, 0, 1, none) 
-X(KUP_PM_SDA,  SDA, 50, G, 1, 1, none) 
-X(FIREFLY_SCL, SCL, 51, G, 2, 2, I2C_nRST) 
-X(FIREFLY_SDA, SDA, 52, G, 3, 2, I2C_nRST) 
-X(CLK_SCL,     SCL, 53, G, 4, 3, I2C_nRST) 
-X(CLK_SDA,     SDA, 54, G, 5, 3, I2C_nRST) 
-X(TEMP_MON_SCL, SCL, 55, G, 6, 4, none) 
-X(TEMP_MON_SDA, SDA, 56, G, 7, 4, none) 
-X(KUP_SYSMON_SCL, SCL, 95, B, 0, 5, none) 
-X(KUP_SYSMON_SDA, SDA, 96, B, 1, 5, none) 
-X(ZUP_SYSMON_SCL, SCL, 40, A, 6, 6, none) 
-X(ZUP_SYSMON_SDA, SDA, 41, A, 7, 6, none) 
-X(MCU_IPMC_ZUP_SCL, SCL, 1, D, 0, 7, none) 
-X(MCU_IPMC_ZUP_SDA, SDA, 2, D, 1, 7, none) 
-X(KUP_RESERVED_SCL, SCL, 3, D, 2, 8, none) 
-X(KUP_RESERVED_SDA, SDA, 4, D, 3, 8, none) 
+// Format: Name, GPIO Port, SCL GPIO Port pin, SCL GPIO Port pin, i2c dev, reset pin
+X(ZUP_PM, B, 2, 3, 0, none) 
+X(KUP_PM, G, 0, 1, 1, none) 
+X(FIREFLY, G, 2, 3, 2, I2C_nRST) 
+X(CLK, G, 4, 5, 3, I2C_nRST) 
+X(TEMP_MON, G, 6, 7, 4, none) 
+X(KUP_SYSMON, B, 0, 1, 5, none) 
+X(ZUP_SYSMON, A, 6, 7, 6, none) 
+X(MCU_IPMC_ZUP, D, 0, 1, 7, none) 
+X(KUP_RESERVED, D, 2, 3, 8, none) 
 //PA0_I2C9_SCL_U0RX
 #undef X

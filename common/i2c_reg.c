@@ -328,6 +328,7 @@ void initI2C6(const uint32_t sysclockfreq)
 #if defined(DEVBOARD) || defined (DEMO) || defined (PROTO)
 void initI2C(int I2C_number, const uint32_t sysclockfreq)
 {
+  #warning "add a check that the pins were initialized"
   // enable I2C module 3
   MAP_SysCtlPeripheralEnable(SYSCTL_PERIPH_I2C[I2C_number]);
   //
@@ -364,6 +365,7 @@ void initI2C(int I2C_number, const uint32_t sysclockfreq)
 
 void initI2C_as_slave(int I2C_number, const uint32_t sysclockfreq)
 {
+    #warning "add a check that the pins were initialized"
   // enable I2C module 0
   MAP_SysCtlPeripheralEnable(SYSCTL_PERIPH_I2C[I2C_number]);
   //
@@ -394,23 +396,26 @@ void initI2C_as_slave(int I2C_number, const uint32_t sysclockfreq)
 #endif
 
 
-#if defined(DEVBOARD) || defined (DEMO)
+#if defined(DEVBOARD) 
 void initI2C_all(const uint32_t sysclockfreq)
 {
-  initI2C(0,sysclockfreq);
-  initI2C(1,sysclockfreq);
-  initI2C(2,sysclockfreq);
-  initI2C(3,sysclockfreq);
-  initI2C(4,sysclockfreq);
-  initI2C(5,sysclockfreq);
-  initI2C(6,sysclockfreq);
-  initI2C_as_slave(7,sysclockfreq);
-  initI2C(8,sysclockfreq);
+  initI2C(I2C_ZUP_PM,sysclockfreq);
+  initI2C(I2C_KUP_PM,sysclockfreq);
+//  initI2C(2,sysclockfreq);
+//  initI2C(3,sysclockfreq);
+//  initI2C(4,sysclockfreq);
+  initI2C(I2C_KUP_SYSMON,sysclockfreq);
+//  initI2C(6,sysclockfreq);
+  initI2C_as_slave(I2C_MCU_IPMC_ZUP,sysclockfreq);
+  initI2C(I2C_KUP_RESERVED,sysclockfreq);
   write_gpio_pin(I2C_MUX_nRST, 0x0); // active low
   MAP_SysCtlDelay(sysclockfreq / 10);
-  ;
   write_gpio_pin(I2C_MUX_nRST, 0x1); // active low
 }
+
+#elif defined (DEMO)
+#error "I2C functions for ptototype has not yet been implemented"
+
 #elif defined(PROTO)
 #error "I2C functions for ptototype has not yet been implemented"
 #endif

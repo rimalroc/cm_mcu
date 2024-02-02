@@ -55,7 +55,9 @@ endif
 #
 # Where to find source files that do not live in this directory.
 #
-VPATH=${BASE}/driverlib
+# For this project, the files are in fact in another folder, lets tart for that one for VPATH
+VPATH=${BASE}/projects/mpi_mcu
+VPATH+=${BASE}/driverlib
 VPATH+=commands
 # board specific 
 VPATH+=${BASE}/common
@@ -69,6 +71,7 @@ VPATH+=${FREERTOS_ROOT}/portable/MemMang
 IPATH=.
 IPATH+=..
 IPATH+=${ROOT}
+IPATH+=${ROOT}/../mpi_mcu
 IPATH+=${FREERTOS_ROOT}/include
 IPATH+=${FREERTOS_ROOT}/portable/GCC/ARM_CM4F
 
@@ -170,8 +173,8 @@ CFLAGS+=-DTARGET_IS_TM4C129_RA1 -DUSE_FREERTOS
 # this rule forces the main function to be recompiled when
 # any of the dependencies are out of date, to get the
 # git and compile time info right.
-SRCS=$(shell ls *.c ../../common/*.c)
-HDRS=$(shell ls *.h ../../common/*.h)
+SRCS=$(shell ls ../mpi_mcu/*.c ../../common/*.c)
+HDRS=$(shell ls ../mpi_mcu/*.h ../../common/*.h)
 ${COMPILER}/mpi_mcu.o: ${SRCS} ${HDRS}
 #
 # Include the automatically generated dependency files.

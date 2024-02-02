@@ -3,6 +3,7 @@
 
 To be completed.
 This should be running in a devboard, the idea is that it can test a devboard using physical connections between two boards, running in a CI.
+Also this project shoudl be the same as the mpi_mcu, just compiled with different flags
 
 ## dependencies
 ### almalinux9

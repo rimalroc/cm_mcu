@@ -37,6 +37,9 @@ extern tSMBus g_sMaster5; // for I2C #4
 extern tSMBus g_sMaster6; // for I2C #6
 extern tSMBus g_sMaster8; // for I2C #8
 
+extern tSMBus g_sMaster7; // # this should never be used, but has to be defined. If someone wants to use it it wont find it
+                          // The number 7 is used for slave, not master
+
 extern volatile tSMBusStatus eStatus0;
 extern volatile tSMBusStatus eStatus1;
 extern volatile tSMBusStatus eStatus2;
