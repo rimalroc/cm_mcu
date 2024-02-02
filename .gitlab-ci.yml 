@@ -1,0 +1,35 @@
+
+stages:          # List of stages for jobs, and their order of execution
+  - build
+  - test
+  - deploy
+
+before_script:
+  - echo " INFO Running before_script, setting up requirements"
+
+.base_docker: &base_docker
+  before_script:
+    - echo " INFO Running before_script, setting up requirements on alma9"
+    - dnf install -y epel-release
+    - dnf install -y arm-none-eabi-binutils-cs.x86_64 arm-none-eabi-gcc-cs.x86_64 arm-none-eabi-gcc-cs-c++.x86_64 arm-none-eabi-newlib.noarch make git
+    - PROJDIR=$(pwd)
+    - cd && git clone https://git.code.sf.net/p/openocd/code && cd code
+    - dnf -y install libusbx-devel libusb libusbx which libtool libftdi libftdi-devel
+    - ./bootstrap && ./configure --enable-ti-icdi --enable-openjtag  --enable-xds110
+    - make
+    - make install
+    - openocd --version
+    - cd $PROJDIR
+
+
+build-job-alma:       # This job runs in the build stage, which runs first.
+  <<: *base_docker
+  image: almalinux:9
+  stage: build
+  tags:
+    - docker
+  script:
+#    - *install_dependencies_alma9
+    - echo "Compiling the code..."
+    - make 
+    - echo "Compile complete."
