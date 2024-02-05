@@ -36,7 +36,7 @@ build-job:       # This job runs in the build stage, which runs first.
     - export FREERTOS_ROOT=$(pwd)/FreeRTOS-Kernel
     - make DEVBOARD=1 DEBUG=1 PART=TM4C1294NCPDT
     - echo "Compile complete."
-  artifact:
+  artifacts:
     paths:
       - projects/mpi_mcu/gcc/mpi_mcu.axf
       - projects/mpi_mcu/gcc/mpi_mcu.bin
@@ -45,7 +45,7 @@ build-job:       # This job runs in the build stage, which runs first.
 test-job:
   tags: 
     - umassminipc02
-  scripts:
+  script:
     - ls projects/mpi_mcu/gcc/mpi_mcu.axf
     - openocd --version
     - make -C projects/mpi_mcu openocd_flash
