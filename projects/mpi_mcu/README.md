@@ -20,12 +20,20 @@ echo 'KERNEL=="ttyACM[0-9]*",MODE:="0666"' | sudo tee -a /etc/udev/rules.d/99-st
 ```
 
 ### requirements
-Additionally, if you want to test from a pc or configure your gtlab-runner
+For compiling this firmware check the `.base_docker:` label on the `.gitlab-ci.yml` to understand the requirements on almalinux9
+Additionally, if you want to test from a pc or configure your gitlab-runner
 
 ```bash
 sudo dnf install -y screen python3-pyserial.noarch
 ```
 
+## CI
+A gitlab runner hs been set with all the requirements. If it is no longer availabe, enable the docker excecution for the build job in `.gitlab-ci.yml`.
+You will be able to get the binaries from the artifacts, but no testing until you setup a new runner.
+
+The umassminipc02 has attached a [Tiva™ C Series TM4C1294 Connected LaunchPad Evaluation Kit](https://www.ti.com/lit/ug/spmu365c/spmu365c.pdf)
+The test-job will load your firmware in it and run an automated test using a simple python script.
+This is a very simple test to make sure that the RTOS is not corrupted and some commands are properly working.
 
 ## Code structure
 

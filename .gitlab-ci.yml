@@ -5,11 +5,12 @@ stages:          # List of stages for jobs, and their order of execution
   - deploy
 
 before_script:
-  - echo " INFO Running before_script, setting up requirements"
+  - echo " INFO: Running before_script, shell executor has all requirements and is ready to go"
 
 .base_docker: &base_docker
+  image: almalinux:9
   before_script:
-    - echo " INFO Running before_script, setting up requirements on alma9"
+    - echo " INFO: Running before_script, setting up requirements on alma9"
     - dnf install -y epel-release
     - dnf install -y arm-none-eabi-binutils-cs.x86_64 arm-none-eabi-gcc-cs.x86_64 arm-none-eabi-gcc-cs-c++.x86_64 arm-none-eabi-newlib.noarch make git
     - PROJDIR=$(pwd)
@@ -23,19 +24,18 @@ before_script:
 
 
 build-job:       # This job runs in the build stage, which runs first.
-  <<: *base_docker
-  image: almalinux:9
+#  <<: *base_docker
   stage: build
   tags:
-    - docker
+    - umassminipc02 # not using docker tag because is uncesseray slow, umassminipc02 has all installed already. do it with docker if running in another machine
   script:
-    - echo "Compiling driverlib..."
+    - echo "INFO: Compiling driverlib..."
     - make -C driverlib/
-    - echo "Compiling the code..."
+    - echo "INFO: Compiling the code..."
     - make check-and-reinit-submodules
     - export FREERTOS_ROOT=$(pwd)/FreeRTOS-Kernel
     - make DEVBOARD=1 DEBUG=1 PART=TM4C1294NCPDT
-    - echo "Compile complete."
+    - echo "INFO: Compile completed."
   artifacts:
     paths:
       - projects/mpi_mcu/gcc/mpi_mcu.axf
@@ -43,6 +43,7 @@ build-job:       # This job runs in the build stage, which runs first.
     expire_in: 1 year
 
 test-job:
+  stage: test
   tags: 
     - umassminipc02
   script:
@@ -51,3 +52,4 @@ test-job:
     - openocd -f /usr/local/share/openocd/scripts/board/ti_ek-tm4c1294xl.cfg -c "program projects/mpi_mcu/gcc/mpi_mcu.axf verify reset exit"
     - timeout 10 cat </dev/ttyACM0 || true
     - tester/test_mpi_mcu.py -v
+    - echo "INFO: Test completed."
