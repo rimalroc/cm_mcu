@@ -22,14 +22,31 @@ before_script:
     - cd $PROJDIR
 
 
-build-job-alma:       # This job runs in the build stage, which runs first.
+build-job:       # This job runs in the build stage, which runs first.
   <<: *base_docker
   image: almalinux:9
   stage: build
   tags:
     - docker
   script:
-#    - *install_dependencies_alma9
+    - echo "Compiling driverlib..."
+    - make -C driverlib/
     - echo "Compiling the code..."
-    - make 
+    - make check-and-reinit-submodules
+    - export FREERTOS_ROOT=$(pwd)/FreeRTOS-Kernel
+    - make DEVBOARD=1 DEBUG=1 PART=TM4C1294NCPDT
     - echo "Compile complete."
+  artifact:
+    paths:
+      - projects/mpi_mcu/gcc/mpi_mcu.axf
+      - projects/mpi_mcu/gcc/mpi_mcu.bin
+    expire_in: 1 year
+
+test-job:
+  tags: 
+    - umassminipc02
+  scripts:
+    - ls projects/mpi_mcu/gcc/mpi_mcu.axf
+    - openocd --version
+    - make -C projects/mpi_mcu openocd_flash
+    - tester/test_mpi_mcu.py -v

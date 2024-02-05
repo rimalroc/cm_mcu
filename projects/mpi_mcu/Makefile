@@ -184,3 +184,4 @@ endif
 
 openocd_flash: ${COMPILER}/mpi_mcu.axf
 	openocd -f /usr/local/share/openocd/scripts/board/ti_ek-tm4c1294xl.cfg -c "program ${COMPILER}/mpi_mcu.axf verify reset exit"
+
