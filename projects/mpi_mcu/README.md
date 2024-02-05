@@ -19,6 +19,14 @@ echo 'ATTRS{idVendor}=="1cbe", ATTRS{idProduct}=="00fd", GROUP="users", MODE="06
 echo 'KERNEL=="ttyACM[0-9]*",MODE:="0666"' | sudo tee -a /etc/udev/rules.d/99-stellaris-launchpad.rules
 ```
 
+### requirements
+Additionally, if you want to test from a pc or configure your gtlab-runner
+
+```bash
+sudo dnf install -y screen python3-pyserial.noarch
+```
+
+
 ## Code structure
 
 To be completed.

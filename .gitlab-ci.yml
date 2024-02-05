@@ -48,5 +48,6 @@ test-job:
   script:
     - ls projects/mpi_mcu/gcc/mpi_mcu.axf
     - openocd --version
-    - make -C projects/mpi_mcu openocd_flash
+    - openocd -f /usr/local/share/openocd/scripts/board/ti_ek-tm4c1294xl.cfg -c "program projects/mpi_mcu/gcc/mpi_mcu.axf verify reset exit"
+    - timeout 1 cat </dev/ttyACM0
     - tester/test_mpi_mcu.py -v
